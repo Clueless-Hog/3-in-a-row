@@ -1,4 +1,4 @@
-package io.github.some_example_name
+package org.cluelesshog.game
 
 import com.badlogic.gdx.ApplicationAdapter
 
