@@ -1,10 +1,10 @@
 @file:JvmName("Lwjgl3Launcher")
 
-package io.github.some_example_name.lwjgl3
+package io.github.game.lwjgl3
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
-import io.github.some_example_name.Main
+import io.github.game.Main
 
 /** Launches the desktop (LWJGL3) application. */
 fun main() {
