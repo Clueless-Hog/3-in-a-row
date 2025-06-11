@@ -4,6 +4,7 @@ eclipse.project.name = appName + '-core'
 dependencies {
   api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
   api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+  api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   api "com.kotcrab.vis:vis-ui:$visUiVersion"
 
@@ -28,6 +29,7 @@ dependencies {
 
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+  api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
   implementation("io.github.cdimascio:dotenv-kotlin:$dotenvVersion")
 

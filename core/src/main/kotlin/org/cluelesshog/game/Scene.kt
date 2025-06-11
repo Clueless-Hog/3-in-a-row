@@ -2,10 +2,13 @@ package org.cluelesshog.game
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxScreen
+import org.cluelesshog.game.asset.Theme
 
 abstract class Scene (
+    protected val theme : Skin = Theme.default(),
     protected val wrapper: Stage = Stage(ScreenViewport())
 ) : KtxScreen {
     private var isVisible = false
