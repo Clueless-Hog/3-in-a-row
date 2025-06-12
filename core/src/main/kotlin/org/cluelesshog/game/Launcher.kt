@@ -2,10 +2,13 @@ package org.cluelesshog.game
 
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
+import ktx.async.KtxAsync
 
 class Launcher : KtxGame<KtxScreen>() {
     override fun create() {
-        addScreen(GameScreen())
-        setScreen<GameScreen>()
+        KtxAsync.initiate()
+
+        SceneController.display = this
+        SceneController.set<MainMenuScreen>()
     }
 }
