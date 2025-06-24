@@ -8,7 +8,7 @@ class GameScreen : Scene() {
     private lateinit var view: BoardView
     private val width = 8
     private val height = 8
-    private var cellSize = 32f
+    private var jewelSize = 32f
 
     override fun dispose() {
         wrapper.dispose()
@@ -16,7 +16,7 @@ class GameScreen : Scene() {
 
     override fun load(): Boolean {
         model = Board(width, height)
-        view = BoardView(model, cellSize)
+        view = BoardView(model, jewelSize)
 
         wrapper.addActor(view.getActor())
 

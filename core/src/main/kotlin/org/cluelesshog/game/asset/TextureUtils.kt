@@ -1,5 +1,6 @@
 package org.cluelesshog.game.asset
 
+import asset.AssetLoader
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -22,13 +23,12 @@ object TextureUtils {
     }
 
     fun loadTextureForJewelType(jewelType: JewelType): TextureRegionDrawable {
-        val color = when (jewelType) {
-            JewelType.DIAMOND -> Color.WHITE
-            JewelType.EMERALD -> Color.GREEN
-            JewelType.RUBY -> Color.RED
+        val texture = when (jewelType) {
+            JewelType.DIAMOND -> AssetLoader.getTile("diamond")
+            JewelType.EMERALD -> AssetLoader.getTile("emerald")
+            JewelType.RUBY -> AssetLoader.getTile("ruby")
         }
 
-        val texture: Texture = createSolidTexture(color)
         return TextureRegionDrawable(TextureRegion(texture))
     }
 }
