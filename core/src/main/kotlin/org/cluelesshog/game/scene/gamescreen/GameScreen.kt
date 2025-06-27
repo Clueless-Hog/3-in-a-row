@@ -22,9 +22,4 @@ class GameScreen : Scene() {
 
         return true
     }
-
-    override fun onResize(newWidth: Int, newHeight: Int) {
-        super.onResize(newWidth, newHeight)
-        view.resize(newWidth, newHeight)
-    }
 }
