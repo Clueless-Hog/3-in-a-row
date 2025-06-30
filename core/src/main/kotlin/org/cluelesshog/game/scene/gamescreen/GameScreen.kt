@@ -8,8 +8,8 @@ class GameScreen : Scene() {
     private lateinit var view: BoardView
     private val rows = 8
     private val columns = 8
-    private val boardWidth = 500
-    private val boardHeight = 500
+    private val boardSize: Float
+        get() = minOf(getScreenWidth() * 0.8f, getScreenHeight() * 0.8f)
 
     override fun dispose() {
         wrapper.dispose()
@@ -17,11 +17,11 @@ class GameScreen : Scene() {
 
     override fun load(): Boolean {
         model = Board(rows, columns)
-        view = BoardView(model, boardWidth, boardHeight)
+        view = BoardView(model, boardSize, boardSize)
 
         view.setPosition(
-            (this.getScreenWidth() - boardWidth) / 2f,
-            (this.getScreenHeight() - boardHeight) / 2f
+            (getScreenWidth() - boardSize) / 2f,
+            (getScreenHeight() - boardSize) / 2f
         )
 
         wrapper.addActor(view.getActor())

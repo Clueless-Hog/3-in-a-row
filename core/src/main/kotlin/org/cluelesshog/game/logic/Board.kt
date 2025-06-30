@@ -6,11 +6,11 @@ class Board(val rows: Int = 8, val columns: Int = 8) {
     init {
         val textures = JewelType.entries
 
-        for (x in 0 until rows) {
-            for (y in 0 until columns) {
-                val possible = textures.filter { canPlace(x, y, it) }
+        for (row in 0 until rows) {
+            for (column in 0 until columns) {
+                val possible = textures.filter { canPlace(row, column, it) }
                 val chosen = possible.random()
-                grid[Pair(x, y)] = Jewel(x, y, chosen)
+                grid[Pair(row, column)] = Jewel(row, column, chosen)
             }
         }
     }

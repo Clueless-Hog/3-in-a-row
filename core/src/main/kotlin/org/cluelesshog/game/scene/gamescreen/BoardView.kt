@@ -9,7 +9,7 @@ import org.cluelesshog.game.asset.TextureUtils.loadTextureForJewelType
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 
-class BoardView(private val grid: Board, private val width: Int, private val height: Int) {
+class BoardView(private val grid: Board, private val width: Float, private val height: Float) {
     private val group = Group()
     private var jewelSize = 32f
 
@@ -35,7 +35,7 @@ class BoardView(private val grid: Board, private val width: Int, private val hei
         val availableWidth = width
         val availableHeight = height
 
-        jewelSize = minOf(availableWidth / grid.rows, availableHeight / grid.columns).toFloat()
+        jewelSize = minOf(availableWidth / grid.rows, availableHeight / grid.columns)
 
         group.apply {
             setSize(grid.rows * jewelSize, grid.columns * jewelSize)
@@ -49,11 +49,6 @@ class BoardView(private val grid: Board, private val width: Int, private val hei
                     setPosition(x * jewelSize, y * jewelSize)
                 }
             }
-
-            val centerX = (availableWidth - width) / 2f
-            val centerY = (availableHeight - height) / 2f
-
-            setPosition(centerX, centerY)
         }
     }
 
