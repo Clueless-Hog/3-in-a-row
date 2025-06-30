@@ -1,6 +1,5 @@
 package org.cluelesshog.game.scene.gamescreen
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Image
@@ -10,14 +9,12 @@ import org.cluelesshog.game.asset.TextureUtils.loadTextureForJewelType
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 
-class BoardView(private val grid: Board, private var jewelSize: Float) {
+class BoardView(private val grid: Board, private val width: Int, private val height: Int) {
     private val group = Group()
+    private var jewelSize = 32f
 
     init {
         group.apply {
-            setSize(grid.width * jewelSize, grid.height * jewelSize)
-            clearChildren()
-
             for ((pos, jewel) in grid.getBoard()) {
                 val (x, y) = pos
 
@@ -25,20 +22,23 @@ class BoardView(private val grid: Board, private var jewelSize: Float) {
             }
         }
 
-        alignment()
+        alignToCenter()
     }
 
     fun getActor(): Group = group
 
-    private fun alignment() {
-        val padding = 50
-        val availableWidth = Gdx.graphics.width - 2 * padding
-        val availableHeight = Gdx.graphics.height - 2 * padding
+    fun setPosition(x: Float, y: Float) {
+        group.setPosition(x, y)
+    }
 
-        jewelSize = minOf(availableWidth / grid.width, availableHeight / grid.height).toFloat()
+    private fun alignToCenter() {
+        val availableWidth = width
+        val availableHeight = height
+
+        jewelSize = minOf(availableWidth / grid.rows, availableHeight / grid.columns).toFloat()
 
         group.apply {
-            setSize(grid.width * jewelSize, grid.height * jewelSize)
+            setSize(grid.rows * jewelSize, grid.columns * jewelSize)
 
             for (actor in children) {
                 actor.apply {
@@ -50,8 +50,8 @@ class BoardView(private val grid: Board, private var jewelSize: Float) {
                 }
             }
 
-            val centerX = padding + (availableWidth - width) / 2f
-            val centerY = padding + (availableHeight - height) / 2f
+            val centerX = (availableWidth - width) / 2f
+            val centerY = (availableHeight - height) / 2f
 
             setPosition(centerX, centerY)
         }

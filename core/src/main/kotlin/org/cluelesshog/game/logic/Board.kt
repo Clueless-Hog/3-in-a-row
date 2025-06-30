@@ -1,13 +1,13 @@
 package org.cluelesshog.game.logic
 
-class Board(val width: Int = 8, val height: Int = 8) {
+class Board(val rows: Int = 8, val columns: Int = 8) {
     private val grid: MutableMap<Pair<Int, Int>, Jewel> = mutableMapOf()
 
     init {
         val textures = JewelType.entries
 
-        for (x in 0 until width) {
-            for (y in 0 until height) {
+        for (x in 0 until rows) {
+            for (y in 0 until columns) {
                 val possible = textures.filter { canPlace(x, y, it) }
                 val chosen = possible.random()
                 grid[Pair(x, y)] = Jewel(x, y, chosen)
