@@ -1,4 +1,4 @@
-package asset
+package org.cluelesshog.engine.asset
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
@@ -8,18 +8,12 @@ import com.badlogic.gdx.graphics.Texture
 object AssetLoader {
     private val manager = AssetManager()
 
-    private val tileFiles = Gdx.files.internal("tiles").list()
-    private val soundFiles = Gdx.files.internal("sounds").list()
+    private val tileFiles = Gdx.files.internal("tiles").list().filter { it.name().endsWith(".png") }
+    private val soundFiles = Gdx.files.internal("sounds").list().filter { it.name().endsWith(".wav") }
 
     init {
-        for (file in tileFiles) {
-            if (!file.name().endsWith(".png")) continue
-            manager.load(file.path(), Texture::class.java)
-        }
-        for (file in soundFiles) {
-            if (!file.name().endsWith(".wav")) continue
-            manager.load(file.path(), Sound::class.java)
-        }
+        tileFiles.forEach { manager.load(it.path(), Texture::class.java) }
+        soundFiles.forEach { manager.load(it.path(), Sound::class.java) }
 
         manager.finishLoading()
     }

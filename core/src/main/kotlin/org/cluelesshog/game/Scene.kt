@@ -46,8 +46,12 @@ abstract class Scene (
             return
         }
 
-        wrapper.act(delta)
+        act(delta)
         wrapper.draw()
+    }
+
+    open fun act(delta: Float) {
+        wrapper.act(delta)
     }
 
     final override fun resize(width: Int, height: Int) {

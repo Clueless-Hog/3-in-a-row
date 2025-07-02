@@ -1,6 +1,6 @@
 package org.cluelesshog.game.asset
 
-import asset.AssetLoader
+import org.cluelesshog.engine.asset.AssetLoader
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
