@@ -1,6 +1,8 @@
 package org.cluelesshog.game.logic
 
-class Board(val rows: Int = 8, val columns: Int = 8) {
+import kotlin.math.abs
+
+class Board(val rows: Int, val columns: Int) {
     private val grid: MutableMap<Pair<Int, Int>, Jewel> = mutableMapOf()
 
     init {
@@ -8,15 +10,36 @@ class Board(val rows: Int = 8, val columns: Int = 8) {
 
         for (row in 0 until rows) {
             for (column in 0 until columns) {
-                val possible = textures.filter { canPlace(row, column, it) }
+                val possible = textures.filter { canPlace(column, row, it) }
                 val chosen = possible.random()
-                grid[Pair(row, column)] = Jewel(row, column, chosen)
+                grid[column to row] = Jewel(column, row, chosen)
             }
         }
     }
 
     fun getBoard() : Map<Pair<Int, Int>, Jewel> {
-        return grid.toMap()
+        return grid
+    }
+
+    fun getJewel(fromPosition: Pair<Int, Int>) = grid[fromPosition]!!
+
+    fun swap(firstPos: Pair<Int, Int>, secondPos: Pair<Int, Int>) : Boolean {
+        val first = grid[firstPos]!!
+        val second = grid[secondPos]!!
+
+        if (isValidSwap(first, second)) {
+            first.swap(second)
+            grid[secondPos] = first
+            grid[firstPos] = second
+
+            return true
+        }
+        return false
+    }
+
+    fun isValidSwap(first: Jewel, second: Jewel): Boolean {
+        return (abs(first.row - second.row) == 1 && abs(first.column - second.column) == 0)
+            || (abs(first.row - second.row) == 0 && abs(first.column - second.column) == 1)
     }
 
     private fun canPlace(x: Int, y: Int, candidate: JewelType): Boolean {

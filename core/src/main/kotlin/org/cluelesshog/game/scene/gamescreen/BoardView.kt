@@ -2,100 +2,56 @@ package org.cluelesshog.game.scene.gamescreen
 
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import org.cluelesshog.game.asset.TextureUtils
-import org.cluelesshog.game.asset.TextureUtils.loadTextureForJewelType
+import ktx.actors.onClick
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 
-class BoardView(private val grid: Board, private val width: Float, private val height: Float) {
-    private val group = Group()
-    private var jewelSize = 32f
+class BoardView(private val grid: Board, width: Float, height: Float) : Group() {
+    private var jewelSize = minOf(width / grid.columns, height / grid.rows)
+    private val actors = mutableMapOf<Int, JewelActor>()
+    private var previousSelectedPos: Pair<Int, Int>? = null
 
     init {
-        group.apply {
-            for ((pos, jewel) in grid.getBoard()) {
-                val (x, y) = pos
-
-                addActor(getJewelImage(jewel, x, y))
-            }
+        for ((pos, jewel) in grid.getBoard()) {
+            val actor = getJewelImage(jewel)
+            addActor(actor)
+            actors[jewel.id] = actor
         }
 
-        alignToCenter()
+        setSize(grid.columns * jewelSize, grid.rows * jewelSize)
     }
 
-    fun getActor(): Group = group
+    private fun refresh() {
+        actors.forEach { it.value.updatePosition() }
 
-    fun setPosition(x: Float, y: Float) {
-        group.setPosition(x, y)
+//        for ((pos, jewel) in grid.getBoard()) {
+//            val actor = actors[pos]!!
+//            actor.updatePosition()
+//            actors[jewel.column to jewel.row] = actor
+//        }
     }
 
-    private fun alignToCenter() {
-        val availableWidth = width
-        val availableHeight = height
+    private fun getJewelImage(jewel: Jewel): JewelActor {
+        val actor = JewelActor(jewel, jewelSize)
 
-        jewelSize = minOf(availableWidth / grid.rows, availableHeight / grid.columns)
-
-        group.apply {
-            setSize(grid.rows * jewelSize, grid.columns * jewelSize)
-
-            for (actor in children) {
-                actor.apply {
-                    val x = (x / width).toInt()
-                    val y = (y / height).toInt()
-
-                    setSize(jewelSize, jewelSize)
-                    setPosition(x * jewelSize, y * jewelSize)
+        actor.onClick {
+            if (previousSelectedPos == null) {
+                highlight()
+                previousSelectedPos = getCoordinates()
+            } else {
+                val selectedJewel = grid.getJewel(previousSelectedPos!!)
+                actors[selectedJewel.id]!!.unhighlight()
+                if (grid.swap(previousSelectedPos!!, getCoordinates())) {
+                    previousSelectedPos = null
+                    refresh()
+                } else {
+                    highlight()
+                    previousSelectedPos = getCoordinates()
                 }
             }
         }
-    }
 
-    private fun getJewelImage(jewel: Jewel, row: Int, column: Int): Image {
-        return createJewelImage(jewel).apply {
-            setSize(jewelSize, jewelSize)
-            setPosition(row * jewelSize, column * jewelSize)
-
-            addListener(object : ClickListener() {
-                val original = drawable
-                var isClicked = false
-
-                override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                    isClicked = !isClicked
-
-                    if (isClicked) {
-                        highlightJewel(this@apply, row, column)
-                    } else {
-                        drawable = original
-                        setSize(jewelSize, jewelSize)
-                        setPosition(row * jewelSize, column * jewelSize)
-                    }
-                }
-            })
-        }
-    }
-
-    private fun highlightJewel(
-        jewel: Image,
-        row: Int,
-        column: Int
-    ) {
-        jewel.apply {
-            drawable = TextureUtils.getHighlightTexture(drawable)
-
-            val newJewelSize = jewelSize * 1.2f
-            val cellPosX = row * jewelSize
-            val cellPosY = column * jewelSize
-            val posX = cellPosX - ((newJewelSize - jewelSize) / 2)
-            val posY = cellPosY - ((newJewelSize - jewelSize) / 2)
-
-            setSize(newJewelSize, newJewelSize)
-            setPosition(posX, posY)
-        }
-    }
-
-    private fun createJewelImage(jewel: Jewel): Image {
-        return Image(loadTextureForJewelType(jewel.type))
+        return actor
     }
 }
