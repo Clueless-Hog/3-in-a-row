@@ -3,13 +3,14 @@ package org.cluelesshog.towerdefence.scene.ingame
 import com.badlogic.gdx.graphics.g2d.Sprite
 import org.cluelesshog.engine.actor.SpritedActor
 import org.cluelesshog.engine.geometry.Position
+import org.cluelesshog.towerdefence.tower.Target
 import kotlin.math.max
 import kotlin.math.min
 
-class Enemy(position: Position, texture: Sprite, val path: List<Position>) : SpritedActor(position, texture) {
+class Enemy(position: Position, texture: Sprite, val path: List<Position>) : Target, SpritedActor(position, texture) {
     val speed = 200f
 
-    var health = 10
+    var health = 15
         set(value) {
             // don't let health drop lower than 0
             field = max(value, 0)
@@ -61,4 +62,16 @@ class Enemy(position: Position, texture: Sprite, val path: List<Position>) : Spr
     }
 
     fun isAlive() = health > 0
+
+    override fun movingTowards(): Position {
+        return currentlyMovingTowards ?: path.first()
+    }
+
+    override fun speed(): Float {
+        if (currentlyMovingTowards == null) {
+            return 0f
+        }
+
+        return speed
+    }
 }

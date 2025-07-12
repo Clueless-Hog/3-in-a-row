@@ -3,6 +3,7 @@ package org.cluelesshog.towerdefence.scene.ingame
 import org.cluelesshog.game.Scene
 import org.cluelesshog.engine.geometry.Position
 import org.cluelesshog.towerdefence.Assets
+import org.cluelesshog.towerdefence.tower.SmartAim
 
 class GameScene: Scene() {
     private val spawnEnemyEveryXSeconds = 3
@@ -10,15 +11,16 @@ class GameScene: Scene() {
     private val enemySpawnPoint = Position(1000, 600)
     private val pathToObjective = listOf(
         enemySpawnPoint.down(300),
-        enemySpawnPoint.down(300).left(400),
-        enemySpawnPoint.down(300).left(400).down(100),
-        enemySpawnPoint.down(300).left(400).down(100).left(200),
+        enemySpawnPoint.down(800).left(400),
+        enemySpawnPoint.down(300).left(400).up(100).left(200),
     )
 
     override fun load(): Boolean {
-        val spot = TowerSpot(Position(3, 3))
-
-        wrapper.addActor(spot)
+        listOf(
+            TowerSpot(Position(3, 3)),
+            TowerSpot(Position(300, 3)),
+            TowerSpot(Position(3, 600)),
+        ).forEach { wrapper.addActor(it) }
 
         wrapper.addListener {
             if (it is TowerSpotClicked) {
@@ -47,9 +49,9 @@ class GameScene: Scene() {
     }
 
     private fun handleTowerPlacement(towerSpot: TowerSpot) {
-        towerSpot.remove()
+        towerSpot.isVisible = false
 
-        wrapper.addActor(Tower(towerSpot.getPosition()))
+        wrapper.addActor(Tower(towerSpot.getPosition(), SmartAim()))
     }
 
     private fun spawnEnemy() {

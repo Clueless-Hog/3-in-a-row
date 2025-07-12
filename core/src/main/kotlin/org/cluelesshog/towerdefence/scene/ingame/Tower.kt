@@ -4,10 +4,11 @@ import org.cluelesshog.engine.actor.SpritedActor
 import org.cluelesshog.engine.geometry.Angle
 import org.cluelesshog.engine.geometry.Position
 import org.cluelesshog.towerdefence.Assets
+import org.cluelesshog.towerdefence.tower.Aim
 import kotlin.math.max
 import kotlin.math.sqrt
 
-class Tower(position: Position) : SpritedActor(position, Assets.tower) {
+class Tower(position: Position, private val aim: Aim) : SpritedActor(position, Assets.tower) {
     val attacksPerSecond = 1.5f
     var untilReloadFinished = 0f
     var damage = 3
@@ -41,7 +42,8 @@ class Tower(position: Position) : SpritedActor(position, Assets.tower) {
 
     private fun attack(enemy: Enemy) {
         untilReloadFinished = 1f / attacksPerSecond
-        val projectile = Projectile(damage, getPosition(), enemy.getPosition())
+        val spawnAt = getPosition()
+        val projectile = Projectile(damage, spawnAt, aim.predict(spawnAt, enemy, 600f))
 
         parent.addActor(projectile)
     }
