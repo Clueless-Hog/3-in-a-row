@@ -72,6 +72,10 @@ subprojects {
         options.isIncremental = true
     }
 
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
     tasks.withType<KotlinCompile> {
         compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
     }

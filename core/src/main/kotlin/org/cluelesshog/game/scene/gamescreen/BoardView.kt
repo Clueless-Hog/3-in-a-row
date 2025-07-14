@@ -1,16 +1,15 @@
 package org.cluelesshog.game.scene.gamescreen
 
 import com.badlogic.gdx.scenes.scene2d.Group
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import ktx.actors.onClick
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
+import org.cluelesshog.game.logic.JewelPos
 
 class BoardView(private val grid: Board, width: Float, height: Float) : Group() {
-    private var jewelSize = minOf(width / grid.columns, height / grid.rows)
+    private var jewelSize = minOf(width / grid.columnsCount, height / grid.rowsCount)
     private val actors = mutableMapOf<Int, JewelActor>()
-    private var previousSelectedPos: Pair<Int, Int>? = null
+    private var previousSelectedPos: JewelPos? = null
 
     init {
         for ((pos, jewel) in grid.getBoard()) {
@@ -19,17 +18,11 @@ class BoardView(private val grid: Board, width: Float, height: Float) : Group() 
             actors[jewel.id] = actor
         }
 
-        setSize(grid.columns * jewelSize, grid.rows * jewelSize)
+        setSize(grid.columnsCount * jewelSize, grid.rowsCount * jewelSize)
     }
 
     private fun refresh() {
         actors.forEach { it.value.updatePosition() }
-
-//        for ((pos, jewel) in grid.getBoard()) {
-//            val actor = actors[pos]!!
-//            actor.updatePosition()
-//            actors[jewel.column to jewel.row] = actor
-//        }
     }
 
     private fun getJewelImage(jewel: Jewel): JewelActor {
@@ -42,6 +35,7 @@ class BoardView(private val grid: Board, width: Float, height: Float) : Group() 
             } else {
                 val selectedJewel = grid.getJewel(previousSelectedPos!!)
                 actors[selectedJewel.id]!!.unhighlight()
+
                 if (grid.swap(previousSelectedPos!!, getCoordinates())) {
                     previousSelectedPos = null
                     refresh()

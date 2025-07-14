@@ -39,4 +39,5 @@ dependencies {
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
+  testImplementation "org.jetbrains.kotlin:kotlin-test:2.1.0"
 }
