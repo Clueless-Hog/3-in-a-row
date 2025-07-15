@@ -59,9 +59,43 @@ class Board {
         return false
     }
 
-    fun isValidSwap(first: Jewel, second: Jewel): Boolean {
-        return (abs(first.pos.row - second.pos.row) == 1 && abs(first.pos.column - second.pos.column) == 0)
+    private fun isValidSwap(first: Jewel, second: Jewel): Boolean {
+        val isNeighbors = (abs(first.pos.row - second.pos.row) == 1 && abs(first.pos.column - second.pos.column) == 0)
             || (abs(first.pos.row - second.pos.row) == 0 && abs(first.pos.column - second.pos.column) == 1)
+
+        return isNeighbors && (checkMatch(first, second) || checkMatch(second, first))
+    }
+
+    private fun checkMatch(from: Jewel, to: Jewel): Boolean {
+        val pos1 = from.pos
+        val pos2 = to.pos
+
+        grid[pos1] = to.copy(pos = pos1)
+        grid[pos2] = from.copy(pos = pos2)
+
+        val result = hasMatchAt(pos1) || hasMatchAt(pos2)
+
+        grid[pos1] = from
+        grid[pos2] = to
+
+        return result
+    }
+
+    private fun hasMatchAt(pos: JewelPos): Boolean {
+        val type = grid[pos]?.type ?: return false
+
+        fun countInDirection(dx: Int, dy: Int): Int {
+            return generateSequence(1) { it + 1 }
+                .map { JewelPos(pos.column + dx * it, pos.row + dy * it) }
+                .take(2)
+                .takeWhile { grid[it]?.type == type }
+                .count()
+        }
+
+        val horizontal = 1 + countInDirection(-1, 0) + countInDirection(1, 0)
+        val vertical = 1 + countInDirection(0, -1) + countInDirection(0, 1)
+
+        return horizontal >= 3 || vertical >= 3
     }
 
     private fun canPlace(x: Int, y: Int, candidate: JewelType): Boolean {
