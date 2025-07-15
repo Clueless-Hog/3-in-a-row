@@ -5,11 +5,9 @@ import org.cluelesshog.game.logic.JewelType.EMERALD
 import org.cluelesshog.game.logic.JewelType.RUBY
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import kotlin.math.sqrt
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

@@ -12,7 +12,7 @@ class BoardView(private val grid: Board, width: Float, height: Float) : Group() 
     private var previousSelectedPos: JewelPos? = null
 
     init {
-        for ((pos, jewel) in grid.getBoard()) {
+        for ((_ , jewel) in grid.getBoard()) {
             val actor = getJewelImage(jewel)
             addActor(actor)
             actors[jewel.id] = actor
