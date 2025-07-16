@@ -14,6 +14,8 @@ class Tower(position: Position, private val aim: Aim) : SpritedActor(position, A
     var damage = 3
     var range = 1400
 
+    var attackSpeedModifier = 1f
+
     fun isReloading() = untilReloadFinished != 0f
 
     override fun act(delta: Float) {
@@ -31,6 +33,8 @@ class Tower(position: Position, private val aim: Aim) : SpritedActor(position, A
                 }
             }
             ?.also { rotation = Angle.between(it.getPosition(), getPosition()).degrees }
+
+        attackSpeedModifier = if (collides(World.player)) 8f else 1f
     }
 
     private fun isInReach(enemy: Enemy): Boolean {
@@ -41,7 +45,7 @@ class Tower(position: Position, private val aim: Aim) : SpritedActor(position, A
     }
 
     private fun attack(enemy: Enemy) {
-        untilReloadFinished = 1f / attacksPerSecond
+        untilReloadFinished = 1f / (attacksPerSecond * attackSpeedModifier)
         val spawnAt = getPosition()
         val projectile = Projectile(damage, spawnAt, aim.predict(spawnAt, enemy, 600f))
 

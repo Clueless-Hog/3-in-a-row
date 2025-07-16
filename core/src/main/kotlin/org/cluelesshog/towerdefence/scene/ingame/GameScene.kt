@@ -1,18 +1,19 @@
 package org.cluelesshog.towerdefence.scene.ingame
 
+import org.cluelesshog.engine.actor.Player
 import org.cluelesshog.game.Scene
 import org.cluelesshog.engine.geometry.Position
 import org.cluelesshog.towerdefence.Assets
-import org.cluelesshog.towerdefence.tower.SmartAim
+import org.cluelesshog.towerdefence.tower.CommonAim
 
 class GameScene: Scene() {
-    private val spawnEnemyEveryXSeconds = 3
+    private val spawnEnemyEveryXSeconds = 0.5f
     private var timePassedSinceLastSpawn = 0f
     private val enemySpawnPoint = Position(1000, 600)
     private val pathToObjective = listOf(
-        enemySpawnPoint.down(300),
-        enemySpawnPoint.down(800).left(400),
-        enemySpawnPoint.down(300).left(400).up(100).left(200),
+        enemySpawnPoint.down(500),
+        enemySpawnPoint.down(500).left(400),
+        enemySpawnPoint.down(500).left(400).up(100).left(200),
     )
 
     override fun load(): Boolean {
@@ -31,6 +32,9 @@ class GameScene: Scene() {
 
             false
         }
+
+        World.player = Player(Position(100, 100))
+        wrapper.addActor(World.player)
 
         return true
     }
@@ -51,7 +55,8 @@ class GameScene: Scene() {
     private fun handleTowerPlacement(towerSpot: TowerSpot) {
         towerSpot.isVisible = false
 
-        wrapper.addActor(Tower(towerSpot.getPosition(), SmartAim()))
+        // wrapper.addActor(Tower(towerSpot.getPosition(), SmartAim()))
+        wrapper.addActor(Tower(towerSpot.getPosition(), CommonAim()))
     }
 
     private fun spawnEnemy() {
