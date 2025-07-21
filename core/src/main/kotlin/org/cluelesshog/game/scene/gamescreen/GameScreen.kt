@@ -1,5 +1,6 @@
 package org.cluelesshog.game.scene.gamescreen
 
+import ktx.actors.centerPosition
 import org.cluelesshog.game.Scene
 import org.cluelesshog.game.logic.Board
 
@@ -19,12 +20,8 @@ class GameScreen : Scene() {
         model = Board(rows, columns)
         view = BoardView(model, boardSize, boardSize)
 
-        view.setPosition(
-            (getScreenWidth() - boardSize) / 2f,
-            (getScreenHeight() - boardSize) / 2f
-        )
-
-        wrapper.addActor(view.getActor())
+        wrapper.addActor(view)
+        view.centerPosition()
 
         return true
     }
