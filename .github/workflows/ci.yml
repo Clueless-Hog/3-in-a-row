@@ -34,3 +34,10 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: core/build/reports/
+          retention-days: 3
