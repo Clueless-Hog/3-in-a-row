@@ -31,7 +31,7 @@ class BoardTest {
             arrayOf(
                 "EDR",
                 "RDD",
-                "DDE"
+                "DDR"
             ), board
         )
         assertTrue(board.swap(JewelPos(0, 0), JewelPos(0, 1)))
