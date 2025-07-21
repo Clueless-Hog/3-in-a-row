@@ -4,6 +4,7 @@ import org.cluelesshog.game.logic.JewelType.DIAMOND
 import org.cluelesshog.game.logic.JewelType.EMERALD
 import org.cluelesshog.game.logic.JewelType.RUBY
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,41 +17,97 @@ class BoardTest {
 
     @BeforeEach
     fun setup() {
-        board = Board(gridOf(
-            rowOf(EMERALD, RUBY, DIAMOND, row = 2),
-            rowOf(RUBY, DIAMOND, RUBY, row = 1),
-            rowOf(DIAMOND, DIAMOND, EMERALD, row = 0),
-        ))
+        board = squareBoardOf(
+            "ERD",
+                    "RDD",
+                    "DDR"
+        )
     }
 
     @Test
     fun testSwapHappens() {
         assertTrue(board.swap(JewelPos(1, 2), JewelPos(2, 2)))
-        assertEquals(DIAMOND, board.getJewel(JewelPos(1, 2)).type)
-        assertEquals(RUBY, board.getJewel(JewelPos(2, 2)).type)
+        assertEqualsBoardOf(
+            arrayOf(
+                "EDR",
+                "RDD",
+                "DDE"
+            ), board
+        )
+        assertTrue(board.swap(JewelPos(0, 0), JewelPos(0, 1)))
+        assertEqualsBoardOf(
+            arrayOf(
+                "EDR",
+                "DDD",
+                "RDR"
+            ), board
+        )
     }
 
     @Test
     fun testSwapDoNotHappens() {
-        assertFalse(board.swap(JewelPos(2, 1), JewelPos(2, 2)))
-        assertEquals(DIAMOND, board.getJewel(JewelPos(2, 2)).type)
-        assertEquals(RUBY, board.getJewel(JewelPos(2, 1)).type)
+        checkInvalidSwap(JewelPos(0, 0), JewelPos(2, 0))
+        checkInvalidSwap(JewelPos(0, 2), JewelPos(2, 0))
+        checkInvalidSwap(JewelPos(1, 1), JewelPos(1, 1))
     }
 
-}
+    private fun checkInvalidSwap(first: JewelPos, second: JewelPos) {
+        val previousBoard = board.getGrid()
 
-fun gridOf(vararg rows: Map<JewelPos, Jewel>): MutableMap<JewelPos, Jewel> {
-    return rows
-        .flatMap { it.entries }
-        .associate { it.toPair() }
-        .toMutableMap()
-}
+        assertFalse(board.swap(first, second))
+        assertEquals(previousBoard, board.getGrid())
+    }
 
-fun rowOf(vararg types: JewelType, row: Int): Map<JewelPos, Jewel> {
-    return types
-        .mapIndexed { col, type ->
-            val pos = JewelPos(col, row)
-            Pair(pos, Jewel(pos, type))
+    private fun gridOf(vararg rows: Map<JewelPos, Jewel>): MutableMap<JewelPos, Jewel> {
+        return rows
+            .flatMap { it.entries }
+            .associate { it.toPair() }
+            .toMutableMap()
+    }
+
+    private fun rowOf(vararg types: JewelType, row: Int): Map<JewelPos, Jewel> {
+        return types
+            .mapIndexed { col, type ->
+                val pos = JewelPos(col, row)
+                Pair(pos, Jewel(pos, type))
+            }
+            .toMap()
+    }
+
+    private fun assertEqualsBoardOf(expected: Array<String>, actual: Board) {
+        val expectedBoard = squareBoardOf(*expected)
+
+        assertEquals(expectedBoard.size(), actual.size())
+
+        for (expectedJewel in expectedBoard) {
+            val actualJewel = actual.getJewel(expectedJewel.pos)
+            assertNotNull(actualJewel)
+            assertEquals(
+                expectedJewel.type,
+                actualJewel.type
+            )
         }
-        .toMap()
+    }
+
+    private fun squareBoardOf(vararg lines: String): Board {
+        require(lines.all { it.length == lines.size })
+
+        val rows = lines.mapIndexed { arrayIndex, line ->
+            val jewelTypes = line.map { char -> fromCharOrThrow(char.toString()) }.toTypedArray<JewelType>()
+            val rowIndex = lines.size - 1 - arrayIndex
+            rowOf(*jewelTypes, row = rowIndex)
+        }.toTypedArray()
+
+        return Board(gridOf(*rows))
+    }
+
+    private fun fromCharOrThrow(c: String): JewelType {
+        return when (c) {
+            "D" -> DIAMOND
+            "R" -> RUBY
+            "E" -> EMERALD
+            else -> error("Unknown JewelType: $c")
+        }
+    }
+
 }

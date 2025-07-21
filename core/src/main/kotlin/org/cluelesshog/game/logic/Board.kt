@@ -1,9 +1,8 @@
 package org.cluelesshog.game.logic
 
-import kotlin.math.abs
 import kotlin.math.sqrt
 
-class Board {
+class Board : Iterable<Jewel> {
     private val grid: MutableMap<JewelPos, Jewel>
     val columnsCount: Int
     val rowsCount: Int
@@ -26,62 +25,65 @@ class Board {
         this.rowsCount = rowsCount
     }
 
-    constructor(grid: MutableMap<JewelPos, Jewel>)  {
+    constructor(grid: MutableMap<JewelPos, Jewel>) {
         this.grid = grid
         this.rowsCount = sqrt(grid.size.toDouble()).toInt()
         this.columnsCount = sqrt(grid.size.toDouble()).toInt()
 
-        require(columnsCount * rowsCount == grid.size){
-            "Доска должна быть прямоугольной"
-        }
+        isRectangle(grid)
     }
 
-    fun getBoard(): Map<JewelPos, Jewel> {
+    override fun iterator(): Iterator<Jewel> {
+        return grid.values.iterator()
+    }
+
+    fun getGrid(): Map<JewelPos, Jewel> {
         return grid.toMap()
+    }
+
+    fun size(): Int {
+        return grid.size
     }
 
     fun getJewel(fromJewelPos: JewelPos) = grid[fromJewelPos]!!
 
     fun swap(firstPos: JewelPos, secondPos: JewelPos): Boolean {
-        val first = grid[firstPos]!!
-        val second = grid[secondPos]!!
+        val first = getJewel(firstPos)
+        val second = getJewel(secondPos)
 
-        if (isValidSwap(first, second)) {
-            val temp = first.copy()
-            first.pos = JewelPos(second.pos.column, second.pos.row)
-            second.pos = JewelPos(temp.pos.column, temp.pos.row)
-
-            grid[secondPos] = first
-            grid[firstPos] = second
-
-            return true
+        if (!isValidSwap(first, second)) {
+            return false
         }
-        return false
+
+        val temp = first.copy()
+        first.pos = second.pos
+        second.pos = temp.pos
+
+        grid[secondPos] = first
+        grid[firstPos] = second
+
+        return true
     }
 
     private fun isValidSwap(first: Jewel, second: Jewel): Boolean {
-        val isNeighbors = (abs(first.pos.row - second.pos.row) == 1 && abs(first.pos.column - second.pos.column) == 0)
-            || (abs(first.pos.row - second.pos.row) == 0 && abs(first.pos.column - second.pos.column) == 1)
-
-        return isNeighbors && (checkMatch(first, second) || checkMatch(second, first))
+        return first.isNeighbor(second)
+            && (checkMatch(first, second) || checkMatch(second, first))
     }
 
     private fun checkMatch(from: Jewel, to: Jewel): Boolean {
-        val pos1 = from.pos
-        val pos2 = to.pos
+        val copyGrid = grid.toMutableMap()
+        val first = from.pos
+        val second = to.pos
 
-        grid[pos1] = to.copy(pos = pos1)
-        grid[pos2] = from.copy(pos = pos2)
+        copyGrid[first] = to.copy(pos = first)
+        copyGrid[second] = from.copy(pos = second)
 
-        val result = hasMatchAt(pos1) || hasMatchAt(pos2)
-
-        grid[pos1] = from
-        grid[pos2] = to
+        val result = hasMatchAt(first, copyGrid) || hasMatchAt(second, copyGrid)
 
         return result
     }
 
-    private fun hasMatchAt(pos: JewelPos): Boolean {
+    private fun hasMatchAt(pos: JewelPos, grid: MutableMap<JewelPos, Jewel>): Boolean {
         val type = grid[pos]?.type ?: return false
 
         fun countInDirection(dx: Int, dy: Int): Int {
@@ -116,5 +118,15 @@ class Board {
         return true
     }
 
+    private fun isRectangle(grid: MutableMap<JewelPos, Jewel>) {
+        val leftBottom = grid.keys.minBy { it.row + it.column }
+        val topRight = grid.keys.maxBy { it.row + it.column }
+
+        for (row in leftBottom.row until topRight.row) {
+            for (column in leftBottom.column until topRight.column) {
+                require(grid.containsKey(JewelPos(column, row)))
+            }
+        }
+    }
 }
 

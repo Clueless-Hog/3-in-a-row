@@ -6,19 +6,19 @@ import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
 
-class BoardView(private val grid: Board, width: Float, height: Float) : Group() {
-    private var jewelSize = minOf(width / grid.columnsCount, height / grid.rowsCount)
+class BoardView(private val board: Board, width: Float, height: Float) : Group() {
+    private var jewelSize = minOf(width / board.columnsCount, height / board.rowsCount)
     private val actors = mutableMapOf<Int, JewelActor>()
     private var previousSelectedPos: JewelPos? = null
 
     init {
-        for ((_ , jewel) in grid.getBoard()) {
+        for (jewel in board) {
             val actor = getJewelImage(jewel)
             addActor(actor)
             actors[jewel.id] = actor
         }
 
-        setSize(grid.columnsCount * jewelSize, grid.rowsCount * jewelSize)
+        setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
     }
 
     private fun refresh() {
@@ -33,10 +33,10 @@ class BoardView(private val grid: Board, width: Float, height: Float) : Group() 
                 highlight()
                 previousSelectedPos = getCoordinates()
             } else {
-                val selectedJewel = grid.getJewel(previousSelectedPos!!)
+                val selectedJewel = board.getJewel(previousSelectedPos!!)
                 actors[selectedJewel.id]!!.unhighlight()
 
-                if (grid.swap(previousSelectedPos!!, getCoordinates())) {
+                if (board.swap(previousSelectedPos!!, getCoordinates())) {
                     previousSelectedPos = null
                     refresh()
                 } else {
