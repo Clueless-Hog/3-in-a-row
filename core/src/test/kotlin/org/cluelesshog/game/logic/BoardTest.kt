@@ -19,8 +19,8 @@ class BoardTest {
     fun setup() {
         board = squareBoardOf(
             "ERD",
-                    "RDD",
-                    "DDR"
+            "RDD",
+            "DDR"
         )
     }
 

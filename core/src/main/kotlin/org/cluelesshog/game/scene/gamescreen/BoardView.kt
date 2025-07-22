@@ -5,6 +5,7 @@ import ktx.actors.onClick
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
+import org.cluelesshog.game.logic.MatchDetect
 
 class BoardView(private val board: Board, width: Float, height: Float) : Group() {
     private var jewelSize = minOf(width / board.columnsCount, height / board.rowsCount)
@@ -22,7 +23,10 @@ class BoardView(private val board: Board, width: Float, height: Float) : Group()
     }
 
     private fun refresh() {
+        val matches = MatchDetect.detect(board)
+        matches.forEach { println(it) }
         actors.forEach { it.value.updatePosition() }
+        println()
     }
 
     private fun getJewelImage(jewel: Jewel): JewelActor {

@@ -65,6 +65,12 @@ class Board : Iterable<Jewel> {
         return true
     }
 
+    fun destroyJewels(jewels: Set<JewelPos>) {
+        jewels.forEach {
+            grid[it] = Jewel(it, JewelType.DIAMOND)
+        }
+    }
+
     private fun isValidSwap(first: Jewel, second: Jewel): Boolean {
         return first.isNeighbor(second)
             && (checkMatch(first, second) || checkMatch(second, first))
@@ -75,8 +81,8 @@ class Board : Iterable<Jewel> {
         val first = from.pos
         val second = to.pos
 
-        copyGrid[first] = to.copy(pos = first)
-        copyGrid[second] = from.copy(pos = second)
+        copyGrid[first] = to.copy(first)
+        copyGrid[second] = from.copy(second)
 
         val result = hasMatchAt(first, copyGrid) || hasMatchAt(second, copyGrid)
 
