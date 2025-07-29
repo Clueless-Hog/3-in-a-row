@@ -2,6 +2,7 @@ package org.cluelesshog.towerdefence.scene.ingame
 
 import org.cluelesshog.engine.actor.ParticleEffectActor
 import org.cluelesshog.engine.actor.SpritedActor
+import org.cluelesshog.engine.audio.AudioManager
 import org.cluelesshog.engine.geometry.Angle
 import org.cluelesshog.engine.geometry.Position
 import org.cluelesshog.towerdefence.Assets
@@ -38,12 +39,17 @@ class Projectile(
     private fun checkCollision() {
         World.enemies.forEach {
             if (collides(it)) {
-                val explosion = ParticleEffectActor(Assets.effectExplosion)
-                explosion.setPosition(x, y)
-                parent?.addActor(explosion)
-                remove()
+                onHit()
                 it.health -= damage
             }
         }
+    }
+
+    private fun onHit() {
+        val explosion = ParticleEffectActor(Assets.effectExplosion)
+        explosion.setPosition(x, y)
+        parent?.addActor(explosion)
+        remove()
+        AudioManager.playSound(Assets.soundBulletExplosion)
     }
 }

@@ -1,6 +1,7 @@
 package org.cluelesshog.towerdefence.scene.ingame
 
 import org.cluelesshog.engine.actor.Player
+import org.cluelesshog.engine.audio.AudioManager
 import org.cluelesshog.game.Scene
 import org.cluelesshog.engine.geometry.Position
 import org.cluelesshog.towerdefence.Assets
@@ -35,6 +36,8 @@ class GameScene: Scene() {
 
         World.player = Player(Position(100, 100))
         wrapper.addActor(World.player)
+
+        AudioManager.playMusic(Assets.musicMain)
 
         return true
     }

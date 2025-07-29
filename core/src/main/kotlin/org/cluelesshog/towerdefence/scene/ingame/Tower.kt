@@ -1,6 +1,7 @@
 package org.cluelesshog.towerdefence.scene.ingame
 
 import org.cluelesshog.engine.actor.SpritedActor
+import org.cluelesshog.engine.audio.AudioManager
 import org.cluelesshog.engine.geometry.Angle
 import org.cluelesshog.engine.geometry.Position
 import org.cluelesshog.towerdefence.Assets
@@ -51,7 +52,7 @@ class Tower(position: Position, private val aim: Aim) : SpritedActor(position, A
         val spawnAt = getPosition()
         val aimAt = aim.predict(spawnAt, enemy, projectileSpeed)
         val projectile = Projectile(damage, projectileSpeed, spawnAt, aimAt)
-
+        AudioManager.playSound(Assets.soundBulletShot)
         parent.addActor(projectile)
     }
 }
