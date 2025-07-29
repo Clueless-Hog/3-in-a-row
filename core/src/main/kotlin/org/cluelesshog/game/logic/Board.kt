@@ -76,7 +76,7 @@ class Board : Iterable<Jewel> {
         return true
     }
 
-    fun destroyJewels(positions: List<JewelPos>) {
+    private fun destroyJewels(positions: List<JewelPos>) {
         for (pos in positions) {
             grid.remove(pos)
         }
