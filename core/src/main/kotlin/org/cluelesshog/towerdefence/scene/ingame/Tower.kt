@@ -12,7 +12,9 @@ class Tower(position: Position, private val aim: Aim) : SpritedActor(position, A
     val attacksPerSecond = 1.5f
     var untilReloadFinished = 0f
     var damage = 3
-    var range = 1400
+    val range = 1400
+
+    val projectileSpeed = 1000f
 
     var attackSpeedModifier = 1f
 
@@ -47,7 +49,8 @@ class Tower(position: Position, private val aim: Aim) : SpritedActor(position, A
     private fun attack(enemy: Enemy) {
         untilReloadFinished = 1f / (attacksPerSecond * attackSpeedModifier)
         val spawnAt = getPosition()
-        val projectile = Projectile(damage, spawnAt, aim.predict(spawnAt, enemy, 600f))
+        val aimAt = aim.predict(spawnAt, enemy, projectileSpeed)
+        val projectile = Projectile(damage, projectileSpeed, spawnAt, aimAt)
 
         parent.addActor(projectile)
     }

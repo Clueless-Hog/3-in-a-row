@@ -1,5 +1,6 @@
 package org.cluelesshog.towerdefence.scene.ingame
 
+import org.cluelesshog.engine.actor.ParticleEffectActor
 import org.cluelesshog.engine.actor.SpritedActor
 import org.cluelesshog.engine.geometry.Angle
 import org.cluelesshog.engine.geometry.Position
@@ -7,8 +8,12 @@ import org.cluelesshog.towerdefence.Assets
 import kotlin.math.cos
 import kotlin.math.sin
 
-class Projectile(private val damage: Int, position: Position, vector: Position): SpritedActor(position, Assets.bullet) {
-    private val speed = 600f
+class Projectile(
+    private val damage: Int,
+    speed: Float,
+    position: Position,
+    vector: Position,
+): SpritedActor(position, Assets.bullet) {
 
     private val vx: Float
     private val vy: Float
@@ -33,6 +38,9 @@ class Projectile(private val damage: Int, position: Position, vector: Position):
     private fun checkCollision() {
         World.enemies.forEach {
             if (collides(it)) {
+                val explosion = ParticleEffectActor(Assets.effectExplosion)
+                explosion.setPosition(x, y)
+                parent?.addActor(explosion)
                 remove()
                 it.health -= damage
             }
