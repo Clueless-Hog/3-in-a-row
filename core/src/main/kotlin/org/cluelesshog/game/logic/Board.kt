@@ -15,7 +15,7 @@ class Board : Iterable<Jewel> {
         for (row in 0 until rowsCount) {
             for (column in 0 until columnsCount) {
                 val possible = textures.filter { canPlace(column, row, it) }
-                val chosenType = possible.random()
+                val chosenType = possible.random(RNG.seed)
                 val pos = JewelPos(column, row)
                 grid[pos] = Jewel(pos, chosenType)
             }
@@ -37,15 +37,20 @@ class Board : Iterable<Jewel> {
         return grid.values.iterator()
     }
 
-    fun getGrid(): Map<JewelPos, Jewel> {
-        return grid.toMap()
+    override fun toString() = buildString {
+        for (row in rowsCount - 1 downTo 0) {
+            for (column in 0 until columnsCount) {
+                append("${getJewel(column, row)} ")
+            }
+            appendLine()
+        }
     }
 
-    fun size(): Int {
-        return grid.size
-    }
+    fun getJewel(pos: JewelPos) = grid[pos]!!
 
-    fun getJewel(fromJewelPos: JewelPos) = grid[fromJewelPos]!!
+    fun getJewel(x: Int, y: Int) = getJewel(JewelPos(x, y))
+
+    fun getJewelOrNull(pos: JewelPos) = grid[pos]
 
     fun swap(firstPos: JewelPos, secondPos: JewelPos): Boolean {
         val first = getJewel(firstPos)
@@ -62,12 +67,52 @@ class Board : Iterable<Jewel> {
         grid[secondPos] = first
         grid[firstPos] = second
 
+        var matches = MatchDetect.detect(this)
+        while (matches.isNotEmpty()) {
+            destroyJewels(matches)
+            matches = MatchDetect.detect(this)
+        }
+
         return true
     }
 
-    fun destroyJewels(jewels: Set<JewelPos>) {
-        jewels.forEach {
-            grid[it] = Jewel(it, JewelType.DIAMOND)
+    fun destroyJewels(positions: List<JewelPos>) {
+        for (pos in positions) {
+            grid.remove(pos)
+        }
+        applyGravity()
+        refillBoard()
+    }
+
+    private fun applyGravity() {
+        for (col in 0 until columnsCount) {
+            val columnJewels = mutableListOf<Jewel>()
+            for (row in 0 until rowsCount) {
+                val pos = JewelPos(col, row)
+                grid[pos]?.let { columnJewels.add(it) }
+            }
+
+            for (row in 0 until rowsCount) {
+                val pos = JewelPos(col, row)
+                if (row < columnJewels.size) {
+                    val jewel = columnJewels[row]
+                    jewel.pos = pos
+                    grid[pos] = jewel
+                } else {
+                    grid.remove(pos)
+                }
+            }
+        }
+    }
+
+    private fun refillBoard() {
+        for (col in 0 until columnsCount) {
+            for (row in 0 until rowsCount) {
+                val pos = JewelPos(col, row)
+                if (grid[pos] == null) {
+                    grid[pos] = Jewel(pos, JewelType.random())
+                }
+            }
         }
     }
 

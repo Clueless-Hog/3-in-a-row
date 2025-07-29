@@ -5,28 +5,24 @@ import ktx.actors.onClick
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
-import org.cluelesshog.game.logic.MatchDetect
 
 class BoardView(private val board: Board, width: Float, height: Float) : Group() {
     private var jewelSize = minOf(width / board.columnsCount, height / board.rowsCount)
-    private val actors = mutableMapOf<Int, JewelActor>()
+    private val actors = mutableMapOf<JewelPos, JewelActor>()
     private var previousSelectedPos: JewelPos? = null
 
     init {
         for (jewel in board) {
             val actor = getJewelImage(jewel)
             addActor(actor)
-            actors[jewel.id] = actor
+            actors[jewel.pos] = actor
         }
 
         setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
     }
 
     private fun refresh() {
-        val matches = MatchDetect.detect(board)
-        matches.forEach { println(it) }
-        actors.forEach { it.value.updatePosition() }
-        println()
+        actors.forEach { it.value.update(board) }
     }
 
     private fun getJewelImage(jewel: Jewel): JewelActor {
@@ -35,17 +31,17 @@ class BoardView(private val board: Board, width: Float, height: Float) : Group()
         actor.onClick {
             if (previousSelectedPos == null) {
                 highlight()
-                previousSelectedPos = getCoordinates()
+                previousSelectedPos = getPos()
             } else {
                 val selectedJewel = board.getJewel(previousSelectedPos!!)
-                actors[selectedJewel.id]!!.unhighlight()
+                actors[selectedJewel.pos]!!.unhighlight()
 
-                if (board.swap(previousSelectedPos!!, getCoordinates())) {
+                if (board.swap(previousSelectedPos!!, getPos())) {
                     previousSelectedPos = null
                     refresh()
                 } else {
                     highlight()
-                    previousSelectedPos = getCoordinates()
+                    previousSelectedPos = getPos()
                 }
             }
         }

@@ -17,6 +17,8 @@ class BoardTest {
 
     @BeforeEach
     fun setup() {
+        RNG.setSeed(123)
+
         board = squareBoardOf(
             "ERD",
             "RDD",
@@ -29,17 +31,17 @@ class BoardTest {
         assertTrue(board.swap(JewelPos(1, 2), JewelPos(2, 2)))
         assertEqualsBoardOf(
             arrayOf(
-                "EDR",
+                "EER",
                 "RDD",
-                "DDR"
+                "DRR"
             ), board
         )
         assertTrue(board.swap(JewelPos(0, 0), JewelPos(0, 1)))
         assertEqualsBoardOf(
             arrayOf(
-                "EDR",
-                "DDD",
-                "RDR"
+                "REE",
+                "DRR",
+                "EER"
             ), board
         )
     }
@@ -52,10 +54,12 @@ class BoardTest {
     }
 
     private fun checkInvalidSwap(first: JewelPos, second: JewelPos) {
-        val previousBoard = board.getGrid()
+        val previousBoard = board.map { it.copy() }
 
         assertFalse(board.swap(first, second))
-        assertEquals(previousBoard, board.getGrid())
+
+        val currentBoard = board.map { it.copy() }
+        assertEquals(previousBoard, currentBoard)
     }
 
     private fun gridOf(vararg rows: Map<JewelPos, Jewel>): MutableMap<JewelPos, Jewel> {
@@ -77,7 +81,7 @@ class BoardTest {
     private fun assertEqualsBoardOf(expected: Array<String>, actual: Board) {
         val expectedBoard = squareBoardOf(*expected)
 
-        assertEquals(expectedBoard.size(), actual.size())
+        assertEquals(expectedBoard.count(), actual.count())
 
         for (expectedJewel in expectedBoard) {
             val actualJewel = actual.getJewel(expectedJewel.pos)
