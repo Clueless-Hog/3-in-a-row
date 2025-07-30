@@ -12,10 +12,10 @@ import kotlin.math.sqrt
 class Tower(position: Position, private val aim: Aim) : SpritedActor(position, Assets.tower) {
     val attacksPerSecond = 1.5f
     var untilReloadFinished = 0f
-    var damage = 3
-    val range = 1400
+    var damage = 5
+    val range = 1000
 
-    val projectileSpeed = 1000f
+    val projectileSpeed = 1500f
 
     var attackSpeedModifier = 1f
 
