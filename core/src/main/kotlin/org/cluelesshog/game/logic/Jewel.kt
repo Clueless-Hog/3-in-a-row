@@ -7,12 +7,4 @@ data class Jewel(var pos: JewelPos, var type: JewelType) {
         return (abs(pos.row - with.pos.row) == 1 && abs(pos.column - with.pos.column) == 0)
             || (abs(pos.row - with.pos.row) == 0 && abs(pos.column - with.pos.column) == 1)
     }
-
-    override fun toString(): String {
-        return when(type) {
-            JewelType.DIAMOND -> "D"
-            JewelType.EMERALD -> "E"
-            JewelType.RUBY -> "R"
-        }
-    }
 }

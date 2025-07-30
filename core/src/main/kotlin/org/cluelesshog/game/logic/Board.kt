@@ -37,15 +37,6 @@ class Board : Iterable<Jewel> {
         return grid.values.iterator()
     }
 
-    override fun toString() = buildString {
-        for (row in rowsCount - 1 downTo 0) {
-            for (column in 0 until columnsCount) {
-                append("${getJewel(column, row)} ")
-            }
-            appendLine()
-        }
-    }
-
     fun getJewel(pos: JewelPos) = grid[pos]!!
 
     fun getJewel(x: Int, y: Int) = getJewel(JewelPos(x, y))
