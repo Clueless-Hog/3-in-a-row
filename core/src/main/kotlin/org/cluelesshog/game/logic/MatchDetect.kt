@@ -1,6 +1,6 @@
 package org.cluelesshog.game.logic
 
-object MatchDetect {
+internal object MatchDetect {
     fun detect(board: Board): List<JewelPos> {
         val result = mutableListOf<JewelPos>()
         board.forEach {
