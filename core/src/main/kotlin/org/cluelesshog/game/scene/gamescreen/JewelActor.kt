@@ -3,12 +3,15 @@ package org.cluelesshog.game.scene.gamescreen
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import org.cluelesshog.game.asset.TextureUtils.getHighlightTexture
 import org.cluelesshog.game.asset.TextureUtils.loadTextureForJewelType
+import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
 
 class JewelActor(
-    private val jewel: Jewel,
-    size: Float
+    private var jewel: Jewel,
+    size: Float,
+    private val x: Int = jewel.pos.column,
+    private val y: Int = jewel.pos.row
 ) : Image(loadTextureForJewelType(jewel.type)) {
     private var originalTexture = loadTextureForJewelType(jewel.type)
     private var highlightTexture = getHighlightTexture(drawable)
@@ -18,7 +21,7 @@ class JewelActor(
     init {
         setSize(size, size)
         setOrigin(width / 2, height / 2)
-        updatePosition()
+        setPosition(jewel.pos.column * (width + 5), jewel.pos.row * (height + 5))
         zIndex = 0
     }
 
@@ -36,11 +39,15 @@ class JewelActor(
         setZIndex(1)
     }
 
-    fun updatePosition() {
-        setPosition(jewel.pos.column * (width + 5), jewel.pos.row * (height + 5))
+    fun update(board: Board) {
+        jewel = board.getJewel(x, y)
+
+        drawable = loadTextureForJewelType(jewel.type)
+        originalTexture = loadTextureForJewelType(jewel.type)
+        highlightTexture = getHighlightTexture(drawable)
     }
 
-    fun getCoordinates(): JewelPos {
+    fun getPos(): JewelPos {
         return jewel.pos
     }
 }
