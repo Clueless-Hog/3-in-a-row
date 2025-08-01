@@ -7,6 +7,7 @@ import org.cluelesshog.game.logic.Board
 class GameScreen : Scene() {
     private lateinit var model: Board
     private lateinit var view: BoardView
+    private lateinit var score: ScoreView
     private val rows = 8
     private val columns = 8
     private val boardSize: Float
@@ -18,9 +19,12 @@ class GameScreen : Scene() {
 
     override fun load(): Boolean {
         model = Board(rows, columns)
-        view = BoardView(model, boardSize, boardSize)
+        score = ScoreView(model)
+        view = BoardView(model, score, boardSize, boardSize)
 
         wrapper.addActor(view)
+        wrapper.addActor(score)
+        score.setPosition(getScreenWidth() * 0.8f, getScreenHeight() * 0.9f)
         view.centerPosition()
 
         return true

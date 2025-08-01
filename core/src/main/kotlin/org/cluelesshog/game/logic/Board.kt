@@ -6,6 +6,7 @@ class Board : Iterable<Jewel> {
     private val grid: MutableMap<JewelPos, Jewel>
     val columnsCount: Int
     val rowsCount: Int
+    val scoreSystem = ScoreSystem()
 
     constructor(columnsCount: Int, rowsCount: Int) {
         grid = mutableMapOf()
@@ -43,6 +44,8 @@ class Board : Iterable<Jewel> {
 
     fun getJewelOrNull(pos: JewelPos) = grid[pos]
 
+    fun getScore() = scoreSystem.score
+
     fun swap(firstPos: JewelPos, secondPos: JewelPos): Boolean {
         val first = getJewel(firstPos)
         val second = getJewel(secondPos)
@@ -69,6 +72,7 @@ class Board : Iterable<Jewel> {
 
     private fun destroyJewels(positions: List<JewelPos>) {
         for (pos in positions) {
+            scoreSystem.upScore(getJewelOrNull(pos)?.type)
             grid.remove(pos)
         }
         applyGravity()

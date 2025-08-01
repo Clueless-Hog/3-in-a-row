@@ -6,7 +6,7 @@ import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
 
-class BoardView(private val board: Board, width: Float, height: Float) : Group() {
+class BoardView(private val board: Board, private val scoreView: ScoreView, width: Float, height: Float) : Group() {
     private var jewelSize = minOf(width / board.columnsCount, height / board.rowsCount)
     private val actors = mutableMapOf<JewelPos, JewelActor>()
     private var previousSelectedPos: JewelPos? = null
@@ -23,6 +23,7 @@ class BoardView(private val board: Board, width: Float, height: Float) : Group()
 
     private fun refresh() {
         actors.forEach { it.value.update(board) }
+        scoreView.update()
     }
 
     private fun getJewelImage(jewel: Jewel): JewelActor {
