@@ -36,6 +36,8 @@ class BoardTest {
                 "DRR"
             ), board
         )
+        assertEquals(board.getScore(), 30)
+
         assertTrue(board.swap(JewelPos(0, 0), JewelPos(0, 1)))
         assertEqualsBoardOf(
             arrayOf(
@@ -44,6 +46,7 @@ class BoardTest {
                 "EER"
             ), board
         )
+        assertEquals(board.getScore(), 180)
     }
 
     @Test
