@@ -3,6 +3,7 @@ package org.cluelesshog.game.logic
 import org.cluelesshog.game.logic.JewelType.DIAMOND
 import org.cluelesshog.game.logic.JewelType.EMERALD
 import org.cluelesshog.game.logic.JewelType.RUBY
+import org.cluelesshog.game.logic.JewelType.AMETHYST
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -28,25 +29,25 @@ class BoardTest {
 
     @Test
     fun testSwapHappens() {
-        assertTrue(board.swap(JewelPos(1, 2), JewelPos(2, 2)))
+        assertTrue(board.swap(JewelPos(2, 1), JewelPos(2, 0)))
         assertEqualsBoardOf(
             arrayOf(
-                "EER",
-                "RDD",
-                "DRR"
+                "DEA",
+                "ERD",
+                "RDR"
             ), board
         )
         assertEquals(board.getScore(), 30)
 
-        assertTrue(board.swap(JewelPos(0, 0), JewelPos(0, 1)))
+        assertTrue(board.swap(JewelPos(1, 1), JewelPos(1, 0)))
         assertEqualsBoardOf(
             arrayOf(
-                "REE",
-                "DRR",
-                "EER"
+                "EDE",
+                "DEA",
+                "EDD"
             ), board
         )
-        assertEquals(board.getScore(), 180)
+        assertEquals(board.getScore(), 90)
     }
 
     @Test
@@ -96,7 +97,17 @@ class BoardTest {
         }
     }
 
-    private fun squareBoardOf(vararg lines: String): Board {
+    private fun fromCharOrThrow(c: String): JewelType {
+        return when (c) {
+            "D" -> DIAMOND
+            "R" -> RUBY
+            "E" -> EMERALD
+            "A" -> AMETHYST
+            else -> error("Unknown JewelType: $c")
+        }
+    }
+
+    fun squareBoardOf(vararg lines: String): Board {
         require(lines.all { it.length == lines.size })
 
         val rows = lines.mapIndexed { arrayIndex, line ->
@@ -106,15 +117,6 @@ class BoardTest {
         }.toTypedArray()
 
         return Board(gridOf(*rows))
-    }
-
-    private fun fromCharOrThrow(c: String): JewelType {
-        return when (c) {
-            "D" -> DIAMOND
-            "R" -> RUBY
-            "E" -> EMERALD
-            else -> error("Unknown JewelType: $c")
-        }
     }
 
 }
