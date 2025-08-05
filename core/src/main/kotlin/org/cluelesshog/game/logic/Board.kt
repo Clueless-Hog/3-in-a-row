@@ -1,6 +1,5 @@
 package org.cluelesshog.game.logic
 
-import kotlin.enums.EnumEntries
 import kotlin.math.sqrt
 
 class Board : Iterable<Jewel> {
