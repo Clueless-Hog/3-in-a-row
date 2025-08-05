@@ -14,6 +14,7 @@ object TextureUtils {
             JewelType.DIAMOND -> AssetLoader.getTile("diamond")
             JewelType.EMERALD -> AssetLoader.getTile("emerald")
             JewelType.RUBY -> AssetLoader.getTile("ruby")
+            JewelType.AMETHYST -> AssetLoader.getTile("amethyst")
         }
 
         return TextureRegionDrawable(TextureRegion(texture))
