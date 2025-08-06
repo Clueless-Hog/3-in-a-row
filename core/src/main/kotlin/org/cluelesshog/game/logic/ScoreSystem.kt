@@ -9,6 +9,7 @@ class ScoreSystem(score: Int = 0) {
             JewelType.DIAMOND -> 10
             JewelType.EMERALD -> 15
             JewelType.RUBY -> 20
+            JewelType.AMETHYST -> 5
             null -> 0
         }
     }

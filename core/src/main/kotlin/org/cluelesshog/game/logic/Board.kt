@@ -11,19 +11,12 @@ class Board : Iterable<Jewel> {
     constructor(columnsCount: Int, rowsCount: Int) {
         grid = mutableMapOf()
 
-        val textures = JewelType.entries
-
-        for (row in 0 until rowsCount) {
-            for (column in 0 until columnsCount) {
-                val possible = textures.filter { canPlace(column, row, it) }
-                val chosenType = possible.random(RNG.seed)
-                val pos = JewelPos(column, row)
-                grid[pos] = Jewel(pos, chosenType)
-            }
-        }
-
         this.columnsCount = columnsCount
         this.rowsCount = rowsCount
+
+        do {
+            randomRefill()
+        } while (!hasPossibleMoves())
     }
 
     constructor(grid: MutableMap<JewelPos, Jewel>) {
@@ -50,7 +43,7 @@ class Board : Iterable<Jewel> {
         val first = getJewel(firstPos)
         val second = getJewel(secondPos)
 
-        if (!isValidSwap(first, second)) {
+        if (!checkMatch(first, second)) {
             return false
         }
 
@@ -67,7 +60,35 @@ class Board : Iterable<Jewel> {
             matches = MatchDetect.detect(this)
         }
 
+        while (!hasPossibleMoves()) {
+            randomRefill()
+        }
+
         return true
+    }
+
+    private fun hasPossibleMoves(): Boolean {
+        for (jewel in grid.values) {
+            for (neighbor in getNeighbors(jewel)) {
+                if (checkMatch(jewel, neighbor)) return true
+            }
+        }
+        return false
+    }
+
+    private fun getNeighbors(jewel: Jewel): List<Jewel> {
+        val (col, row) = jewel.pos
+
+        val directions = listOf(
+            1 to 0,
+            -1 to 0,
+            0 to 1,
+            0 to -1
+        )
+
+        return directions.mapNotNull { (dx, dy) ->
+            grid[JewelPos(col + dx, row + dy)]
+        }
     }
 
     private fun destroyJewels(positions: List<JewelPos>) {
@@ -111,12 +132,9 @@ class Board : Iterable<Jewel> {
         }
     }
 
-    private fun isValidSwap(first: Jewel, second: Jewel): Boolean {
-        return first.isNeighbor(second)
-            && (checkMatch(first, second) || checkMatch(second, first))
-    }
-
     private fun checkMatch(from: Jewel, to: Jewel): Boolean {
+        if (!from.isNeighbor(to)) return false
+
         val copyGrid = grid.toMutableMap()
         val first = from.pos
         val second = to.pos
@@ -144,6 +162,17 @@ class Board : Iterable<Jewel> {
         val vertical = 1 + countInDirection(0, -1) + countInDirection(0, 1)
 
         return horizontal >= 3 || vertical >= 3
+    }
+
+    private fun randomRefill() {
+        for (row in 0 until rowsCount) {
+            for (column in 0 until columnsCount) {
+                val possible = JewelType.entries.filter { canPlace(column, row, it) }
+                val chosenType = possible.random(RNG.seed)
+                val pos = JewelPos(column, row)
+                grid[pos] = Jewel(pos, chosenType)
+            }
+        }
     }
 
     private fun canPlace(x: Int, y: Int, candidate: JewelType): Boolean {

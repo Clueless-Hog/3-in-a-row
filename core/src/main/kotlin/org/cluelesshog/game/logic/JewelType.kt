@@ -14,7 +14,8 @@ object RNG {
 enum class JewelType {
     DIAMOND,
     EMERALD,
-    RUBY;
+    RUBY,
+    AMETHYST;
 
     companion object {
         fun random(random: Random = RNG.seed): JewelType {
