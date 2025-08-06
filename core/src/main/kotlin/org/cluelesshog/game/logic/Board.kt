@@ -69,12 +69,26 @@ class Board : Iterable<Jewel> {
 
     private fun hasPossibleMoves(): Boolean {
         for (jewel in grid.values) {
-            for (neighborPos in jewel.pos.neighbors()) {
-                val neighbor = grid[neighborPos] ?: continue
+            for (neighbor in getNeighbors(jewel)) {
                 if (checkMatch(jewel, neighbor)) return true
             }
         }
         return false
+    }
+
+    private fun getNeighbors(jewel: Jewel): List<Jewel> {
+        val (col, row) = jewel.pos
+
+        val directions = listOf(
+            1 to 0,
+            -1 to 0,
+            0 to 1,
+            0 to -1
+        )
+
+        return directions.mapNotNull { (dx, dy) ->
+            grid[JewelPos(col + dx, row + dy)]
+        }
     }
 
     private fun destroyJewels(positions: List<JewelPos>) {
