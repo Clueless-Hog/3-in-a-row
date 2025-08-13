@@ -6,7 +6,7 @@ internal object MatchDetect {
         board.forEach {
             result += getMatches(it.pos, board)
         }
-        return result
+        return result.distinct()
     }
 
     private fun getMatches(pos: JewelPos, board: Board): List<JewelPos> {

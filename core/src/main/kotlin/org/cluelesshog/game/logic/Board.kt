@@ -39,12 +39,13 @@ class Board : Iterable<Jewel> {
 
     fun getScore() = scoreSystem.score
 
-    fun swap(firstPos: JewelPos, secondPos: JewelPos): Boolean {
+    fun swap(firstPos: JewelPos, secondPos: JewelPos): List<SwapResult> {
+        val result = mutableListOf<SwapResult>()
         val first = getJewel(firstPos)
         val second = getJewel(secondPos)
 
         if (!checkMatch(first, second)) {
-            return false
+            return emptyList()
         }
 
         val temp = first.copy()
@@ -57,6 +58,7 @@ class Board : Iterable<Jewel> {
         var matches = MatchDetect.detect(this)
         while (matches.isNotEmpty()) {
             destroyJewels(matches)
+            result += SwapResult(matches, grid.toMap())
             matches = MatchDetect.detect(this)
         }
 
@@ -64,7 +66,7 @@ class Board : Iterable<Jewel> {
             randomRefill()
         }
 
-        return true
+        return result.distinct()
     }
 
     private fun hasPossibleMoves(): Boolean {
@@ -94,6 +96,7 @@ class Board : Iterable<Jewel> {
     private fun destroyJewels(positions: List<JewelPos>) {
         for (pos in positions) {
             scoreSystem.upScore(getJewelOrNull(pos)?.type)
+            getJewelOrNull(pos)?.crushed = true
             grid.remove(pos)
         }
         applyGravity()

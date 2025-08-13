@@ -1,53 +1,41 @@
 package org.cluelesshog.game.scene.gamescreen
 
+import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.scenes.scene2d.Action
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import org.cluelesshog.game.asset.TextureUtils.getHighlightTexture
 import org.cluelesshog.game.asset.TextureUtils.loadTextureForJewelType
-import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
-import org.cluelesshog.game.logic.JewelPos
 
-class JewelActor(
+data class JewelActor(
     private var jewel: Jewel,
-    size: Float,
-    private val x: Int = jewel.pos.column,
-    private val y: Int = jewel.pos.row
+    val size: Float
 ) : Image(loadTextureForJewelType(jewel.type)) {
-    private var originalTexture = loadTextureForJewelType(jewel.type)
-    private var highlightTexture = getHighlightTexture(drawable)
-
-    var isClicked = false
-
     init {
         setSize(size, size)
+        updatePosition()
         setOrigin(width / 2, height / 2)
-        setPosition(jewel.pos.column * (width + 5), jewel.pos.row * (height + 5))
-        zIndex = 0
+        setZIndex(1)
     }
 
     fun highlight() {
-        isClicked = true
-        setDrawable(highlightTexture)
-        setScale(1.2f)
+        addAction(Actions.scaleTo(1.2f, 1.2f, .05f, Interpolation.ExpOut(2f, 3f)))
         setZIndex(100)
     }
 
     fun unhighlight() {
-        isClicked = false
-        setDrawable(originalTexture)
-        setScale(1f)
+        addAction(Actions.scaleTo(1f, 1f, .05f, Interpolation.ExpOut(2f, 3f)))
         setZIndex(1)
     }
 
-    fun update(board: Board) {
-        jewel = board.getJewel(x, y)
-
-        drawable = loadTextureForJewelType(jewel.type)
-        originalTexture = loadTextureForJewelType(jewel.type)
-        highlightTexture = getHighlightTexture(drawable)
+    fun update() {
+        updatePosition()
     }
 
-    fun getPos(): JewelPos {
-        return jewel.pos
+    fun getPos() = jewel.pos
+
+    private fun updatePosition() {
+        setPosition(jewel.pos.column * (width + 5), jewel.pos.row * (height + 5))
     }
 }

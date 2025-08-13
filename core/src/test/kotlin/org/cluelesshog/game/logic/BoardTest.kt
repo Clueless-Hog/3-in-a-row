@@ -29,7 +29,7 @@ class BoardTest {
 
     @Test
     fun testSwapHappens() {
-        assertTrue(board.swap(JewelPos(2, 1), JewelPos(2, 0)))
+        assertTrue(board.swap(JewelPos(2, 1), JewelPos(2, 0)).isNotEmpty())
         assertEqualsBoardOf(
             arrayOf(
                 "DEA",
@@ -39,7 +39,7 @@ class BoardTest {
         )
         assertEquals(board.getScore(), 30)
 
-        assertTrue(board.swap(JewelPos(1, 1), JewelPos(1, 0)))
+        assertTrue(board.swap(JewelPos(1, 1), JewelPos(1, 0)).isNotEmpty())
         assertEqualsBoardOf(
             arrayOf(
                 "EDE",
@@ -60,7 +60,7 @@ class BoardTest {
     private fun checkInvalidSwap(first: JewelPos, second: JewelPos) {
         val previousBoard = board.map { it.copy() }
 
-        assertFalse(board.swap(first, second))
+        assertFalse(board.swap(first, second).isNotEmpty())
 
         val currentBoard = board.map { it.copy() }
         assertEquals(previousBoard, currentBoard)
