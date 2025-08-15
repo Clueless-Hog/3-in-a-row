@@ -33,8 +33,6 @@ class Board : Iterable<Jewel> {
 
     fun getJewel(pos: JewelPos) = grid[pos]!!
 
-    fun getJewel(x: Int, y: Int) = getJewel(JewelPos(x, y))
-
     fun getJewelOrNull(pos: JewelPos) = grid[pos]
 
     fun getScore() = scoreSystem.score
@@ -58,7 +56,9 @@ class Board : Iterable<Jewel> {
         var matches = MatchDetect.detect(this)
         while (matches.isNotEmpty()) {
             destroyJewels(matches)
-            result += SwapResult(matches, grid.toMap())
+            val moved = applyGravity()
+            val new = refillBoard()
+            result += SwapResult(matches, moved, new, scoreSystem.score)
             matches = MatchDetect.detect(this)
         }
 
@@ -67,6 +67,20 @@ class Board : Iterable<Jewel> {
         }
 
         return result.distinct()
+    }
+
+    fun validateBoard(grid: Map<JewelPos, Jewel>): Boolean {
+        var isValid = true
+        for ((pos, jewel) in grid) {
+            if (pos != jewel.pos) {
+                println("❌ Mismatch: key=$pos but jewel.pos=${jewel.pos} (type=${jewel.type})")
+                isValid = false
+            }
+        }
+        if (isValid) {
+            println("✅ Board is consistent: all JewelPos match Jewel.pos")
+        }
+        return isValid
     }
 
     private fun hasPossibleMoves(): Boolean {
@@ -99,11 +113,10 @@ class Board : Iterable<Jewel> {
             getJewelOrNull(pos)?.crushed = true
             grid.remove(pos)
         }
-        applyGravity()
-        refillBoard()
     }
 
-    private fun applyGravity() {
+    private fun applyGravity(): MutableMap<JewelPos, Int> {
+        val result = mutableMapOf<JewelPos, Int>()
         for (col in 0 until columnsCount) {
             val columnJewels = mutableListOf<Jewel>()
             for (row in 0 until rowsCount) {
@@ -115,6 +128,9 @@ class Board : Iterable<Jewel> {
                 val pos = JewelPos(col, row)
                 if (row < columnJewels.size) {
                     val jewel = columnJewels[row]
+                    if (jewel.pos.row - pos.row > 0) {
+                        result[jewel.pos] = jewel.pos.row - pos.row
+                    }
                     jewel.pos = pos
                     grid[pos] = jewel
                 } else {
@@ -122,17 +138,23 @@ class Board : Iterable<Jewel> {
                 }
             }
         }
+
+        return result
     }
 
-    private fun refillBoard() {
+    private fun refillBoard(): List<Jewel> {
+        val result = mutableListOf<Jewel>()
         for (col in 0 until columnsCount) {
             for (row in 0 until rowsCount) {
                 val pos = JewelPos(col, row)
                 if (grid[pos] == null) {
-                    grid[pos] = Jewel(pos, JewelType.random())
+                    val newJewel = Jewel(pos, JewelType.random())
+                    grid[pos] = newJewel
+                    result += newJewel
                 }
             }
         }
+        return result
     }
 
     private fun checkMatch(from: Jewel, to: Jewel): Boolean {

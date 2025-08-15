@@ -1,7 +1,9 @@
 package org.cluelesshog.game.scene.gamescreen
 
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.Group
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import ktx.actors.onClick
 import org.cluelesshog.game.logic.Board
@@ -13,6 +15,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
     private var jewelSize = minOf(width / board.columnsCount, height / board.rowsCount)
     private val actors = mutableMapOf<JewelPos, JewelActor>()
     private var previous: JewelActor? = null
+    private val boardTop = board.rowsCount * jewelSize
 
     init {
         for (jewel in board) {
@@ -21,30 +24,90 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
             actors[jewel.pos] = actor
         }
 
-        val boardTop = board.rowsCount * jewelSize
         actors.values.forEach {
             val toX = it.x
             val toY = it.y
 
-            it.y = boardTop + (jewelSize * it.getPos().row)
+            it.y = boardTop + (jewelSize * it.pos.row)
             it.addAction(Actions.moveTo(toX, toY, 2f, Interpolation.ExpOut(10f, 4f)))
         }
         setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
     }
 
+    private fun getJewelActorOrNull(pos: JewelPos) = actors[pos]
+
+    private fun getJewelActor(pos: JewelPos) = getJewelActorOrNull(pos)!!
+
     private fun refresh(result: List<SwapResult>) {
+        val steps = mutableListOf<Action>()
+        touchable = Touchable.disabled
         result.forEach { res ->
-            res.matches.forEach {
-                actors[it]!!.addAction(
-                    Actions.sequence(
-                        Actions.fadeOut(.5f),
-                        Actions.removeActor(),
-                        Actions.run {
-                            actors.remove(it)
-                        }
+            steps += Actions.run {
+                res.matches.forEach { pos ->
+                    actors[pos]!!.addAction(
+                        Actions.sequence(
+                            Actions.fadeOut(.4f),
+                            Actions.removeActor(),
+                            Actions.run { actors.remove(pos) }
+                        )
                     )
-                )
+                }
             }
+            steps += Actions.run {
+                gravity(res.movedJewels)
+            }
+            steps += Actions.run {
+                refill(res.newJewels)
+            }
+            steps += Actions.run { scoreView.update(res.scoreUp) }
+            steps += Actions.delay(1f)
+        }
+        addAction(Actions.sequence(*steps.toTypedArray(), Actions.run {
+            touchable = Touchable.enabled
+        }))
+    }
+
+    fun validateBoard(grid: Map<JewelPos, JewelActor>): Boolean {
+        var isValid = true
+        for ((pos, jewel) in grid) {
+            if (pos != jewel.pos) {
+                println("❌ Mismatch: key=$pos but jewel.pos=${jewel.pos} (type=${jewel.jewel.type})")
+                isValid = false
+            }
+        }
+        if (isValid) {
+            println("✅ Board is consistent: all JewelPos match Jewel.pos")
+        }
+        return isValid
+    }
+
+
+    private fun gravity(movedJewels: MutableMap<JewelPos, Int>) {
+        movedJewels.forEach {
+            val pos = it.key
+            val step = it.value
+            val newPos = JewelPos(pos.column, pos.row - step)
+            val actor = getJewelActor(pos)
+            actors[newPos] = actor
+            actor.pos = newPos
+            actors.remove(pos)
+
+            actor.addAction(Actions.moveBy(0f, -(step * jewelSize), 2f, Interpolation.ExpOut(10f, 4f)))
+        }
+        validateBoard(actors)
+    }
+
+    private fun refill(newJewels: List<Jewel>) {
+        newJewels.forEach { newJewel ->
+            val newActor = getJewelImage(newJewel)
+            actors[newJewel.pos] = newActor
+
+            val toX = newActor.x
+            val toY = newActor.y
+
+            newActor.y = boardTop + (jewelSize * newActor.pos.row)
+            addActor(newActor)
+            newActor.addAction(Actions.moveTo(toX, toY, 2f, Interpolation.ExpOut(10f, 4f)))
         }
     }
 
@@ -59,15 +122,19 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
             }
             val prev = previous!!
             prev.unhighlight()
-
-            val swap = board.swap(prev.getPos(), getPos())
+            val swap = board.swap(prev.pos, pos)
             if (swap.isEmpty()) {
                 highlight()
                 previous = this
                 return@onClick
             }
-            actors[getPos()] = this
-            actors[prev.getPos()] = prev
+
+            val temp = prev.pos
+            prev.pos = this.pos
+            this.pos = temp
+
+            actors[pos] = this
+            actors[prev.pos] = prev
 
             swapActors(prev, this) {
                 refresh(swap)
