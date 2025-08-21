@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import ktx.actors.onClick
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
@@ -34,53 +35,48 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
     }
 
-    private fun getJewelActorOrNull(pos: JewelPos) = actors[pos]
-
-    private fun getJewelActor(pos: JewelPos) = getJewelActorOrNull(pos)!!
+    private fun getJewelActor(pos: JewelPos) = actors[pos]!!
 
     private fun refresh(result: List<SwapResult>) {
-        val steps = mutableListOf<Action>()
         touchable = Touchable.disabled
+        val duration = .2f
+        var sequence: SequenceAction? = null
         result.forEach { res ->
+            val steps = mutableListOf<Action>()
             steps += Actions.run {
                 res.matches.forEach { pos ->
-                    actors[pos]!!.addAction(
+                    val actor = getJewelActor(pos)
+                    actors.remove(pos)
+                    actor.addAction(
                         Actions.sequence(
-                            Actions.fadeOut(.4f),
+                            Actions.fadeOut(.1f),
                             Actions.removeActor(),
-                            Actions.run { actors.remove(pos) }
                         )
                     )
                 }
             }
+            steps += Actions.run { scoreView.update(res.scoreUp) }
+            steps += Actions.delay(duration)
             steps += Actions.run {
                 gravity(res.movedJewels)
             }
+            steps += Actions.delay(duration)
             steps += Actions.run {
                 refill(res.newJewels)
             }
-            steps += Actions.run { scoreView.update(res.scoreUp) }
-            steps += Actions.delay(1f)
-        }
-        addAction(Actions.sequence(*steps.toTypedArray(), Actions.run {
-            touchable = Touchable.enabled
-        }))
-    }
+            steps += Actions.delay(2f)
 
-    fun validateBoard(grid: Map<JewelPos, JewelActor>): Boolean {
-        var isValid = true
-        for ((pos, jewel) in grid) {
-            if (pos != jewel.pos) {
-                println("❌ Mismatch: key=$pos but jewel.pos=${jewel.pos} (type=${jewel.jewel.type})")
-                isValid = false
+            val actionGroup = Actions.sequence(*steps.toTypedArray())
+
+            if (sequence != null) {
+                sequence.addAction(actionGroup)
+            } else {
+                sequence = actionGroup
             }
         }
-        if (isValid) {
-            println("✅ Board is consistent: all JewelPos match Jewel.pos")
-        }
-        return isValid
+        sequence!!.addAction(Actions.run { touchable = Touchable.enabled })
+        addAction(sequence)
     }
-
 
     private fun gravity(movedJewels: MutableMap<JewelPos, Int>) {
         movedJewels.forEach {
@@ -94,7 +90,6 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
 
             actor.addAction(Actions.moveBy(0f, -(step * jewelSize), 2f, Interpolation.ExpOut(10f, 4f)))
         }
-        validateBoard(actors)
     }
 
     private fun refill(newJewels: List<Jewel>) {
@@ -108,6 +103,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
             newActor.y = boardTop + (jewelSize * newActor.pos.row)
             addActor(newActor)
             newActor.addAction(Actions.moveTo(toX, toY, 2f, Interpolation.ExpOut(10f, 4f)))
+            newActor.addAction(Actions.delay(.1f))
         }
     }
 
@@ -155,6 +151,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         second.addAction(
             Actions.sequence(
                 Actions.moveTo(firstPos.first, firstPos.second, 0.3f, Interpolation.ExpOut(2f, 3f)),
+                Actions.delay(.1f),
                 Actions.run { onComplete() }
             ))
     }

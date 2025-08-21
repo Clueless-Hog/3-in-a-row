@@ -69,20 +69,6 @@ class Board : Iterable<Jewel> {
         return result.distinct()
     }
 
-    fun validateBoard(grid: Map<JewelPos, Jewel>): Boolean {
-        var isValid = true
-        for ((pos, jewel) in grid) {
-            if (pos != jewel.pos) {
-                println("❌ Mismatch: key=$pos but jewel.pos=${jewel.pos} (type=${jewel.type})")
-                isValid = false
-            }
-        }
-        if (isValid) {
-            println("✅ Board is consistent: all JewelPos match Jewel.pos")
-        }
-        return isValid
-    }
-
     private fun hasPossibleMoves(): Boolean {
         for (jewel in grid.values) {
             for (neighbor in getNeighbors(jewel)) {
@@ -150,7 +136,7 @@ class Board : Iterable<Jewel> {
                 if (grid[pos] == null) {
                     val newJewel = Jewel(pos, JewelType.random())
                     grid[pos] = newJewel
-                    result += newJewel
+                    result += newJewel.copy()
                 }
             }
         }
@@ -164,8 +150,8 @@ class Board : Iterable<Jewel> {
         val first = from.pos
         val second = to.pos
 
-        copyGrid[first] = to.copy(first)
-        copyGrid[second] = from.copy(second)
+        copyGrid[first] = to.copy(pos = first)
+        copyGrid[second] = from.copy(pos = second)
 
         val result = hasMatchAt(first, copyGrid) || hasMatchAt(second, copyGrid)
 
