@@ -17,7 +17,6 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
     private val actors = mutableMapOf<JewelPos, JewelActor>()
     private var previous: JewelActor? = null
     private val boardTop = board.rowsCount * jewelSize
-    private var destroyed = 0
 
     init {
         for (jewel in board) {
@@ -38,40 +37,9 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
 
     private fun getJewelActor(pos: JewelPos) = actors[pos]!!
 
-    private fun refresh(result: List<SwapResult>) {
-//        touchable = Touchable.disabled
-        destroyed = 0
-        handleSwap(result.first(), result)
+    private fun gravityAndRefill(movedJewels: MutableMap<JewelPos, Int>, newJewels: List<Jewel>, onRefill: () -> Unit) {
+        val afterGravityAndRefillTrigger = ThresholdTrigger(newJewels.size + movedJewels.size, onRefill)
 
-//        sequence!!.addAction(Actions.run { touchable = Touchable.enabled })
-//        addAction(sequence)
-    }
-
-    private fun handleSwap(result: SwapResult, result1: List<SwapResult>) {
-        result.matches.forEach { pos ->
-            val actor = getJewelActor(pos)
-            actors.remove(pos)
-            actor.addAction(
-                Actions.sequence(
-                    Actions.fadeOut(.1f),
-                    Actions.removeActor(),
-                    Actions.run {
-                        onBlockDestroyed(result)
-                    }
-                )
-            )
-        }
-    }
-
-    private fun onBlockDestroyed(res: SwapResult) {
-        if (res.matches.size == ++destroyed) {
-            gravityAndRefill(res.movedJewels, res.newJewels)
-            scoreView.update(res.scoreUp)
-        }
-    }
-
-    private fun gravityAndRefill(movedJewels: MutableMap<JewelPos, Int>, newJewels: List<Jewel>) {
-        var counter = Counter()
         movedJewels.forEach {
             val pos = it.key
             val step = it.value
@@ -84,14 +52,11 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
             actor.addAction(
                 Actions.sequence(
                     Actions.moveBy(0f, -(step * jewelSize), .7f, Interpolation.exp10Out),
-                    counter
+                    Actions.run { afterGravityAndRefillTrigger.attempt() }
                 )
             )
         }
-//        while (!counter.reached(movedJewels.size)) {
-//        }
 
-        counter = Counter()
         newJewels.forEach {
             val newActor = getJewelImage(it)
             actors[it.pos] = newActor
@@ -101,10 +66,13 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
 
             newActor.y = boardTop + (jewelSize * newActor.pos.row)
             addActor(newActor)
-            newActor.addAction(Actions.moveTo(toX, toY, .7f, Interpolation.exp10Out))
+            newActor.addAction(
+                Actions.sequence(
+                    Actions.moveTo(toX, toY, .7f, Interpolation.exp10Out),
+                    Actions.run { afterGravityAndRefillTrigger.attempt() }
+                )
+            )
         }
-//        while (!counter.reached(newJewels.size)) {
-//        }
     }
 
     private fun gravity(movedJewels: MutableMap<JewelPos, Int>) {
@@ -160,9 +128,8 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
             actors[pos] = this
             actors[prev.pos] = prev
 
-            swapActors(prev, this) {
-                refresh(swap)
-            }
+            // TODO должен содержать/инкапсулировать присвоения, которые проводятся выше
+            swapActors(prev, this, swap)
 
             previous = null
         }
@@ -170,7 +137,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         return actor
     }
 
-    private fun swapActors(first: JewelActor, second: JewelActor, onSwapFinished: () -> Unit) {
+    private fun swapActors(first: JewelActor, second: JewelActor, swap: List<SwapResult>) {
         val firstPos = first.x to first.y
         val secondPos = second.x to second.y
 
@@ -179,22 +146,47 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         second.addAction(
             Actions.sequence(
                 Actions.moveTo(firstPos.first, firstPos.second, 0.3f, Interpolation.ExpOut(2f, 3f)),
-                Actions.run { onSwapFinished() }
+                Actions.run { onMatch(ArrayDeque(swap)) }
             ))
+    }
+
+    private fun onMatch(swap: ArrayDeque<SwapResult>) {
+        val combination = swap.removeFirstOrNull()
+        if (combination == null) {
+            return
+        }
+
+        val trigger = ThresholdTrigger(combination.matches.size) {
+            scoreView.update(combination.scoreUp)
+
+            gravityAndRefill(combination.movedJewels, combination.newJewels) {
+                onMatch(swap)
+            }
+        }
+
+        combination.matches.forEach { pos ->
+            val actor = getJewelActor(pos)
+            actors.remove(pos)
+            actor.addAction(
+                Actions.sequence(
+                    Actions.scaleBy(.1f, .1f, .1f),
+                    Actions.scaleBy(-.3f, -.3f, .1f),
+                    Actions.fadeOut(.1f),
+                    Actions.run {
+                        trigger.attempt()
+                        actor.remove()
+                    },
+                )
+            )
+        }
     }
 }
 
-class Counter : Action() {
-    private var counter: Int = 0
-
-    fun reached(amount: Int): Boolean {
-        Thread.sleep(100)
-//        println("$counter: $amount")
-        return counter == amount
-    }
-
-    override fun act(delta: Float): Boolean {
-        ++counter
-        return true
+data class ThresholdTrigger(private val threshold: Int, private val callback: () -> Unit) {
+    private var attempts = 0
+    fun attempt() {
+        if (++attempts == threshold) {
+            callback()
+        }
     }
 }
