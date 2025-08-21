@@ -5,18 +5,19 @@ import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import ktx.actors.onClick
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
 import org.cluelesshog.game.logic.SwapResult
+import kotlin.collections.forEach
 
 class BoardView(private val board: Board, private val scoreView: ScoreView, width: Float, height: Float) : Group() {
     private var jewelSize = minOf(width / board.columnsCount, height / board.rowsCount)
     private val actors = mutableMapOf<JewelPos, JewelActor>()
     private var previous: JewelActor? = null
     private val boardTop = board.rowsCount * jewelSize
+    private var destroyed = 0
 
     init {
         for (jewel in board) {
@@ -38,44 +39,72 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
     private fun getJewelActor(pos: JewelPos) = actors[pos]!!
 
     private fun refresh(result: List<SwapResult>) {
-        touchable = Touchable.disabled
-        val duration = .2f
-        var sequence: SequenceAction? = null
-        result.forEach { res ->
-            val steps = mutableListOf<Action>()
-            steps += Actions.run {
-                res.matches.forEach { pos ->
-                    val actor = getJewelActor(pos)
-                    actors.remove(pos)
-                    actor.addAction(
-                        Actions.sequence(
-                            Actions.fadeOut(.1f),
-                            Actions.removeActor(),
-                        )
-                    )
-                }
-            }
-            steps += Actions.run { scoreView.update(res.scoreUp) }
-            steps += Actions.delay(duration)
-            steps += Actions.run {
-                gravity(res.movedJewels)
-            }
-            steps += Actions.delay(duration)
-            steps += Actions.run {
-                refill(res.newJewels)
-            }
-            steps += Actions.delay(2f)
+//        touchable = Touchable.disabled
+        destroyed = 0
+        handleSwap(result.first(), result)
 
-            val actionGroup = Actions.sequence(*steps.toTypedArray())
+//        sequence!!.addAction(Actions.run { touchable = Touchable.enabled })
+//        addAction(sequence)
+    }
 
-            if (sequence != null) {
-                sequence.addAction(actionGroup)
-            } else {
-                sequence = actionGroup
-            }
+    private fun handleSwap(result: SwapResult, result1: List<SwapResult>) {
+        result.matches.forEach { pos ->
+            val actor = getJewelActor(pos)
+            actors.remove(pos)
+            actor.addAction(
+                Actions.sequence(
+                    Actions.fadeOut(.1f),
+                    Actions.removeActor(),
+                    Actions.run {
+                        onBlockDestroyed(result)
+                    }
+                )
+            )
         }
-        sequence!!.addAction(Actions.run { touchable = Touchable.enabled })
-        addAction(sequence)
+    }
+
+    private fun onBlockDestroyed(res: SwapResult) {
+        if (res.matches.size == ++destroyed) {
+            gravityAndRefill(res.movedJewels, res.newJewels)
+            scoreView.update(res.scoreUp)
+        }
+    }
+
+    private fun gravityAndRefill(movedJewels: MutableMap<JewelPos, Int>, newJewels: List<Jewel>) {
+        var counter = Counter()
+        movedJewels.forEach {
+            val pos = it.key
+            val step = it.value
+            val newPos = JewelPos(pos.column, pos.row - step)
+            val actor = getJewelActor(pos)
+            actors[newPos] = actor
+            actor.pos = newPos
+            actors.remove(pos)
+
+            actor.addAction(
+                Actions.sequence(
+                    Actions.moveBy(0f, -(step * jewelSize), .7f, Interpolation.exp10Out),
+                    counter
+                )
+            )
+        }
+//        while (!counter.reached(movedJewels.size)) {
+//        }
+
+        counter = Counter()
+        newJewels.forEach {
+            val newActor = getJewelImage(it)
+            actors[it.pos] = newActor
+
+            val toX = newActor.x
+            val toY = newActor.y
+
+            newActor.y = boardTop + (jewelSize * newActor.pos.row)
+            addActor(newActor)
+            newActor.addAction(Actions.moveTo(toX, toY, .7f, Interpolation.exp10Out))
+        }
+//        while (!counter.reached(newJewels.size)) {
+//        }
     }
 
     private fun gravity(movedJewels: MutableMap<JewelPos, Int>) {
@@ -103,7 +132,6 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
             newActor.y = boardTop + (jewelSize * newActor.pos.row)
             addActor(newActor)
             newActor.addAction(Actions.moveTo(toX, toY, 2f, Interpolation.ExpOut(10f, 4f)))
-            newActor.addAction(Actions.delay(.1f))
         }
     }
 
@@ -142,7 +170,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         return actor
     }
 
-    private fun swapActors(first: JewelActor, second: JewelActor, onComplete: () -> Unit) {
+    private fun swapActors(first: JewelActor, second: JewelActor, onSwapFinished: () -> Unit) {
         val firstPos = first.x to first.y
         val secondPos = second.x to second.y
 
@@ -151,8 +179,22 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         second.addAction(
             Actions.sequence(
                 Actions.moveTo(firstPos.first, firstPos.second, 0.3f, Interpolation.ExpOut(2f, 3f)),
-                Actions.delay(.1f),
-                Actions.run { onComplete() }
+                Actions.run { onSwapFinished() }
             ))
+    }
+}
+
+class Counter : Action() {
+    private var counter: Int = 0
+
+    fun reached(amount: Int): Boolean {
+        Thread.sleep(100)
+//        println("$counter: $amount")
+        return counter == amount
+    }
+
+    override fun act(delta: Float): Boolean {
+        ++counter
+        return true
     }
 }
