@@ -20,7 +20,13 @@ data class JewelActor(
     }
 
     fun highlight() {
-        addAction(Actions.scaleTo(1.2f, 1.2f, .05f, Interpolation.ExpOut(2f, 3f)))
+        addAction(
+            Actions.sequence(
+                Actions.scaleTo(1.2f, 1.2f, .1f, Interpolation.ExpOut(2f, 3f)),
+                Actions.scaleTo(1.1f, 1.1f, .1f, Interpolation.ExpOut(2f, 3f)),
+                Actions.scaleTo(1.15f, 1.15f, .1f, Interpolation.ExpOut(2f, 3f)),
+            )
+        )
         setZIndex(100)
     }
 

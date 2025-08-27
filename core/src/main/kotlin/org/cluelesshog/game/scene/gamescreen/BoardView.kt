@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import engine.ThresholdTrigger
 import ktx.actors.onClick
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
@@ -18,7 +19,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
     private val boardTop = board.rowsCount * jewelSize
 
     init {
-        touchable = Touchable.disabled
+        disableInput()
         for (jewel in board) {
             val actor = getJewelImage(jewel)
             addActor(actor)
@@ -26,7 +27,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         }
 
         val initTrigger = ThresholdTrigger(board.count()) {
-            touchable = Touchable.enabled
+            enableInput()
         }
         actors.values.forEach {
             val toX = it.x
@@ -45,7 +46,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
     }
 
-    private fun gravityAndRefill(movedJewels: MutableMap<JewelPos, Int>, newJewels: List<Jewel>, onRefill: () -> Unit) {
+    private fun gravityAndRefill(movedJewels: Map<JewelPos, Int>, newJewels: List<Jewel>, onRefill: () -> Unit) {
         val afterGravityAndRefillTrigger = ThresholdTrigger(newJewels.size + movedJewels.size, onRefill)
 
         for ((pos, step) in movedJewels) {
@@ -136,13 +137,13 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
     private fun onMatch(swap: ArrayDeque<SwapResult>) {
         val combination = swap.removeFirstOrNull() ?: return
 
-        touchable = Touchable.disabled
+        disableInput()
         val trigger = ThresholdTrigger(combination.matches.size) {
             scoreView.update(combination.scoreUp)
 
             gravityAndRefill(combination.movedJewels, combination.newJewels) {
+                enableInput()
                 onMatch(swap)
-                touchable = Touchable.enabled
             }
         }
 
@@ -163,13 +164,12 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         }
 
     }
-}
 
-data class ThresholdTrigger(private val threshold: Int, private val callback: () -> Unit) {
-    private var attempts = 0
-    fun attempt() {
-        if (++attempts == threshold) {
-            callback()
-        }
+    private fun disableInput() {
+        touchable = Touchable.disabled
+    }
+
+    private fun enableInput() {
+        touchable = Touchable.enabled
     }
 }

@@ -96,7 +96,6 @@ class Board : Iterable<Jewel> {
     private fun destroyJewels(positions: List<JewelPos>) {
         for (pos in positions) {
             scoreSystem.upScore(getJewelOrNull(pos)?.type)
-            getJewelOrNull(pos)?.crushed = true
             grid.remove(pos)
         }
     }
