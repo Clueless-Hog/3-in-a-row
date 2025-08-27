@@ -102,25 +102,25 @@ class Board : Iterable<Jewel> {
 
     private fun applyGravity(): MutableMap<JewelPos, Int> {
         val result = mutableMapOf<JewelPos, Int>()
+
         for (col in 0 until columnsCount) {
-            val columnJewels = mutableListOf<Jewel>()
-            for (row in 0 until rowsCount) {
-                val pos = JewelPos(col, row)
-                grid[pos]?.let { columnJewels.add(it) }
+            val columnJewels = (0 until rowsCount)
+                .mapNotNull { row -> grid[JewelPos(col, row)] }
+
+            columnJewels.forEachIndexed { newRow, jewel ->
+                val oldPos = jewel.pos
+                val newPos = JewelPos(col, newRow)
+
+                if (oldPos.row > newRow) {
+                    result[oldPos] = oldPos.row - newRow
+                }
+
+                jewel.pos = newPos
+                grid[newPos] = jewel
             }
 
-            for (row in 0 until rowsCount) {
-                val pos = JewelPos(col, row)
-                if (row < columnJewels.size) {
-                    val jewel = columnJewels[row]
-                    if (jewel.pos.row - pos.row > 0) {
-                        result[jewel.pos] = jewel.pos.row - pos.row
-                    }
-                    jewel.pos = pos
-                    grid[pos] = jewel
-                } else {
-                    grid.remove(pos)
-                }
+            for (row in columnJewels.size until rowsCount) {
+                grid.remove(JewelPos(col, row))
             }
         }
 
