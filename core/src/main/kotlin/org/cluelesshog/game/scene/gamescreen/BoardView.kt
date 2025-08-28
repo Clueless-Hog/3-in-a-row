@@ -95,16 +95,16 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
     }
 
     private fun clickOnJewel(jewel: JewelActor) {
-        val first = jewel
+        val second = jewel
         if (previous == null) {
-            first.highlight()
-            previous = first
+            second.highlight()
+            previous = second
 
             return
         }
 
-        val second = previous!!
-        second.unhighlight()
+        val first = previous!!
+        first.unhighlight()
         val swap = board.swap(first.pos, second.pos)
         if (swap.isEmpty()) {
             second.highlight()
