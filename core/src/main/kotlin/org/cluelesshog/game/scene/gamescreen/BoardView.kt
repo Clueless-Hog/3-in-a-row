@@ -89,31 +89,32 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
     private fun getJewelImage(jewel: Jewel): JewelActor {
         val actor = JewelActor(jewel, jewelSize)
 
-        actor.onClick {
-            if (previous == null) {
-                highlight()
-                previous = this
-                return@onClick
-            }
-            val prev = previous!!
-            prev.unhighlight()
-
-            val result = board.swap(prev.pos, pos)
-            if (result.isEmpty()) {
-                highlight()
-                previous = this
-                return@onClick
-            }
-
-            swapActors(prev, this, result)
-
-            previous = null
-        }
+        actor.onClick{ clickOnJewel(this) }
 
         return actor
     }
 
-    private fun swapActors(first: JewelActor, second: JewelActor, swap: List<SwapResult>) {
+    private fun clickOnJewel(jewel: JewelActor) {
+        val first = jewel
+        if (previous == null) {
+            first.highlight()
+            previous = first
+
+            return
+        }
+
+        val second = previous!!
+        second.unhighlight()
+        val swap = board.swap(first.pos, second.pos)
+        if (swap.isEmpty()) {
+            second.highlight()
+            previous = second
+
+            return
+        }
+
+        previous = null
+
         val temp = first.pos
         first.pos = second.pos
         second.pos = temp
