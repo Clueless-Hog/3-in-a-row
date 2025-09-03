@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import kotlin.collections.toSet
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -31,20 +30,20 @@ class BoardTest {
     @Test
     fun testSwapHappens() {
         var result = board.swap(JewelPos(2, 1), JewelPos(2, 0))
-        assertEquals(
-            setOf(
+        assertEqualsCollectionsInAnyOrderElements(
+            listOf(
                 JewelPos(0, 0),
                 JewelPos(1, 0),
                 JewelPos(2, 0)
-            ), result[0].matches.toSet()
+            ), result[0].matches
         )
         assertJewelsFellDown(result[0].matches, result[0].movedJewels)
-        assertEquals(
-            setOf(
+        assertEqualsCollectionsInAnyOrderElements(
+            listOf(
                 Jewel(JewelPos(0, 2), DIAMOND),
                 Jewel(JewelPos(1, 2), EMERALD),
                 Jewel(JewelPos(2, 2), AMETHYST)
-            ), result[0].newJewels.toSet()
+            ), result[0].newJewels
         )
         assertTrue(result.isNotEmpty())
         assertEqualsBoardOf(
@@ -57,20 +56,20 @@ class BoardTest {
         assertEquals(board.getScore(), 30)
 
         result = board.swap(JewelPos(1, 1), JewelPos(1, 0))
-        assertEquals(
-            setOf(
+        assertEqualsCollectionsInAnyOrderElements(
+            listOf(
                 JewelPos(0, 0),
                 JewelPos(1, 0),
                 JewelPos(2, 0)
-            ), result[0].matches.toSet()
+            ), result[0].matches
         )
         assertJewelsFellDown(result[0].matches, result[0].movedJewels)
-        assertEquals(
-            setOf(
+        assertEqualsCollectionsInAnyOrderElements(
+            listOf(
                 Jewel(JewelPos(0, 2), EMERALD),
                 Jewel(JewelPos(1, 2), DIAMOND),
                 Jewel(JewelPos(2, 2), EMERALD)
-            ), result[0].newJewels.toSet()
+            ), result[0].newJewels
         )
         assertEqualsBoardOf(
             arrayOf(
@@ -80,6 +79,19 @@ class BoardTest {
             ), board
         )
         assertEquals(board.getScore(), 90)
+    }
+
+    private fun assertEqualsCollectionsInAnyOrderElements(
+        expected: Collection<Any>,
+        actual: Collection<Any>
+    ) {
+        fun <T> Collection<T>.frequencyMap(): Map<T, Int> =
+            this.groupingBy { it }.eachCount()
+
+        val expectedFreq = expected.frequencyMap()
+        val actualFreq = actual.frequencyMap()
+
+        assertEquals(expectedFreq, actualFreq)
     }
 
     private fun assertJewelsFellDown(matches: List<JewelPos>, movedJewels: Map<JewelPos, Int>) {
