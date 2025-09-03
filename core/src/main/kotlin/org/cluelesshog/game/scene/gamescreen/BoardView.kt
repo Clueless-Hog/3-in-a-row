@@ -46,8 +46,15 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
     }
 
-    private fun gravityAndRefill(movedJewels: Map<JewelPos, Int>, newJewels: List<Jewel>, onRefill: () -> Unit) {
-        val afterGravityAndRefillTrigger = ThresholdTrigger(newJewels.size + movedJewels.size, onRefill)
+    private fun gravityAndRefill(swap: SwapResult, onComplete: () -> Unit) {
+        val movedJewels = swap.movedJewels;
+        val newJewels = swap.newJewels;
+        val afterGravityAndRefillTrigger = ThresholdTrigger(newJewels.size + movedJewels.size) {
+            refillActors(swap.newBoard) {
+                enableInput()
+                onComplete()
+            }
+        }
 
         for ((pos, step) in movedJewels) {
             val newPos = JewelPos(pos.column, pos.row - step)
@@ -145,7 +152,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
 
         val first = previous!!
         first.unhighlight()
-        val result = board.swap(first.pos, second.pos)
+        val result = ArrayDeque(board.swap(first.pos, second.pos))
         if (result.isEmpty()) {
             second.highlight()
             previous = second
@@ -170,26 +177,29 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         second.addAction(
             Actions.sequence(
                 Actions.moveTo(firstPos.first, firstPos.second, 0.3f, Interpolation.exp10Out),
-                Actions.run { onMatch(ArrayDeque(result)) }
+                Actions.run { handleSwapResult(result) }
             )
         )
     }
 
-    private fun onMatch(swap: ArrayDeque<SwapResult>) {
+    private fun handleSwapResult(swap: ArrayDeque<SwapResult>) {
         val combination = swap.removeFirstOrNull() ?: return
 
-        disableInput()
-        val gravityAndRefillTrigger = ThresholdTrigger(combination.matches.size) {
-            scoreView.update(combination.scoreUp)
+        onSwap(combination) {
+            handleSwapResult(swap)
+        }
+    }
 
-            gravityAndRefill(combination.movedJewels, combination.newJewels) {
-                refillActors(combination.newBoard) {
-                    enableInput()
-                    onMatch(swap)
-                }
-            }
+    private fun onSwap(combination: SwapResult?, onComplete: () -> Unit) {
+        if (combination === null) {
+            return
         }
 
+        disableInput()
+
+        val completionTrigger = ThresholdTrigger(combination.matches.size) {
+            onSwapFinished(combination, onComplete)
+        }
 
         combination.matches.forEach { pos ->
             val actor = actors[pos]!!
@@ -200,13 +210,18 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
                     Actions.scaleBy(-1f, -1f, .2f),
                     Actions.fadeOut(.1f),
                     Actions.run {
-                        gravityAndRefillTrigger.attempt()
+                        completionTrigger.attempt()
                         actor.remove()
                     },
                 )
             )
         }
+    }
 
+    private fun onSwapFinished(combination: SwapResult, onComplete: () -> Unit) {
+        scoreView.update(combination.scoreUp)
+
+        gravityAndRefill(combination, onComplete)
     }
 
     private fun disableInput() {
