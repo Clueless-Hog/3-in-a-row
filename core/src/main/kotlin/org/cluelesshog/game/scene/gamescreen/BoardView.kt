@@ -86,6 +86,47 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         }
     }
 
+    private fun refillActors(newBoard: Map<JewelPos, Jewel>, onRefill: () -> Unit) {
+        newBoard.ifEmpty {
+            onRefill()
+            return
+        }
+
+        val onCompleteTrigger = ThresholdTrigger(actors.size, onRefill)
+
+        val clearActorsTrigger = ThresholdTrigger(actors.size) {
+            for ((pos, jewel) in newBoard) {
+                val newActor = getJewelImage(jewel)
+                newActor.scaleBy(-1f, -1f)
+                addActor(newActor)
+                actors[pos] = newActor
+                newActor.addAction(
+                    Actions.sequence(
+                        Actions.scaleBy(1.1f, 1.1f, .2f),
+                        Actions.scaleBy(-.1f, -.1f, .1f),
+                        Actions.run {
+                            onCompleteTrigger.attempt()
+                        }
+                    )
+                )
+            }
+        }
+
+        actors.values.forEach {
+            it.addAction(
+                Actions.sequence(
+                    Actions.scaleBy(.1f, .1f, .1f),
+                    Actions.scaleBy(-1f, -1f, .2f),
+                    Actions.fadeOut(.1f),
+                    Actions.run {
+                        clearActorsTrigger.attempt()
+                        it.remove()
+                    }
+                )
+            )
+        }
+    }
+
     private fun getJewelImage(jewel: Jewel): JewelActor {
         val actor = JewelActor(jewel, jewelSize)
 
@@ -94,8 +135,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         return actor
     }
 
-    private fun clickOnJewel(jewel: JewelActor) {
-        val second = jewel
+    private fun clickOnJewel(second: JewelActor) {
         if (previous == null) {
             second.highlight()
             previous = second
@@ -105,8 +145,8 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
 
         val first = previous!!
         first.unhighlight()
-        val swap = board.swap(first.pos, second.pos)
-        if (swap.isEmpty()) {
+        val result = board.swap(first.pos, second.pos)
+        if (result.isEmpty()) {
             second.highlight()
             previous = second
 
@@ -130,7 +170,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         second.addAction(
             Actions.sequence(
                 Actions.moveTo(firstPos.first, firstPos.second, 0.3f, Interpolation.exp10Out),
-                Actions.run { onMatch(ArrayDeque(swap)) }
+                Actions.run { onMatch(ArrayDeque(result)) }
             )
         )
     }
@@ -139,14 +179,17 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         val combination = swap.removeFirstOrNull() ?: return
 
         disableInput()
-        val trigger = ThresholdTrigger(combination.matches.size) {
+        val gravityAndRefillTrigger = ThresholdTrigger(combination.matches.size) {
             scoreView.update(combination.scoreUp)
 
             gravityAndRefill(combination.movedJewels, combination.newJewels) {
-                enableInput()
-                onMatch(swap)
+                refillActors(combination.newBoard) {
+                    enableInput()
+                    onMatch(swap)
+                }
             }
         }
+
 
         combination.matches.forEach { pos ->
             val actor = actors[pos]!!
@@ -157,7 +200,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
                     Actions.scaleBy(-1f, -1f, .2f),
                     Actions.fadeOut(.1f),
                     Actions.run {
-                        trigger.attempt()
+                        gravityAndRefillTrigger.attempt()
                         actor.remove()
                     },
                 )

@@ -56,17 +56,28 @@ class Board : Iterable<Jewel> {
         var matches = MatchDetect.detect(this)
         while (matches.isNotEmpty()) {
             destroyJewels(matches)
-            val moved = applyGravity()
-            val new = refillBoard()
-            result += SwapResult(matches, moved, new, scoreSystem.score)
+            result += SwapResult(
+                matches,
+                applyGravity(),
+                refillBoard(),
+                scoreSystem.score,
+                getNewBoardIfNecessary()
+            )
+
             matches = MatchDetect.detect(this)
         }
 
+        return result.distinct()
+    }
+
+    private fun getNewBoardIfNecessary(): MutableMap<JewelPos, Jewel> {
+        var result = mutableMapOf<JewelPos, Jewel>()
+
         while (!hasPossibleMoves()) {
-            randomRefill()
+            result = randomRefill()
         }
 
-        return result.distinct()
+        return result
     }
 
     private fun hasPossibleMoves(): Boolean {
@@ -174,15 +185,19 @@ class Board : Iterable<Jewel> {
         return horizontal >= 3 || vertical >= 3
     }
 
-    private fun randomRefill() {
+    private fun randomRefill(): MutableMap<JewelPos, Jewel> {
+        val result = mutableMapOf<JewelPos, Jewel>()
         for (row in 0 until rowsCount) {
             for (column in 0 until columnsCount) {
                 val possible = JewelType.entries.filter { canPlace(column, row, it) }
                 val chosenType = possible.random(RNG.seed)
                 val pos = JewelPos(column, row)
-                grid[pos] = Jewel(pos, chosenType)
+                val jewel = Jewel(pos, chosenType)
+                grid[pos] = jewel
+                result[pos] = jewel
             }
         }
+        return result
     }
 
     private fun canPlace(x: Int, y: Int, candidate: JewelType): Boolean {
