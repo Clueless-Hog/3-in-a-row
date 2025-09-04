@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 
@@ -30,7 +30,7 @@ class BoardTest {
     @Test
     fun testSwapHappens() {
         var result = board.swap(JewelPos(2, 1), JewelPos(2, 0))
-        assertEqualsCollectionsInAnyOrderElements(
+        assertEquals(
             listOf(
                 JewelPos(0, 0),
                 JewelPos(1, 0),
@@ -38,7 +38,7 @@ class BoardTest {
             ), result[0].matches
         )
         assertJewelsFellDown(result[0].matches, result[0].movedJewels)
-        assertEqualsCollectionsInAnyOrderElements(
+        assertEquals(
             listOf(
                 Jewel(JewelPos(0, 2), DIAMOND),
                 Jewel(JewelPos(1, 2), EMERALD),
@@ -56,7 +56,7 @@ class BoardTest {
         assertEquals(board.getScore(), 30)
 
         result = board.swap(JewelPos(1, 1), JewelPos(1, 0))
-        assertEqualsCollectionsInAnyOrderElements(
+        assertEquals(
             listOf(
                 JewelPos(0, 0),
                 JewelPos(1, 0),
@@ -64,7 +64,7 @@ class BoardTest {
             ), result[0].matches
         )
         assertJewelsFellDown(result[0].matches, result[0].movedJewels)
-        assertEqualsCollectionsInAnyOrderElements(
+        assertEquals(
             listOf(
                 Jewel(JewelPos(0, 2), EMERALD),
                 Jewel(JewelPos(1, 2), DIAMOND),
@@ -81,7 +81,7 @@ class BoardTest {
         assertEquals(board.getScore(), 90)
     }
 
-    private fun assertEqualsCollectionsInAnyOrderElements(
+    private fun assertEquals(
         expected: Collection<Any>,
         actual: Collection<Any>
     ) {
@@ -117,7 +117,7 @@ class BoardTest {
         assertFalse(board.swap(first, second).isNotEmpty())
 
         val currentBoard = board.map { it.copy() }
-        assertEquals(previousBoard, currentBoard)
+        kotlin.test.assertEquals(previousBoard, currentBoard)
     }
 
     private fun gridOf(vararg rows: Map<JewelPos, Jewel>) = rows

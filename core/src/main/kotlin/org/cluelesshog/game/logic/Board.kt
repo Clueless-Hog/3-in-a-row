@@ -60,14 +60,14 @@ class Board : Iterable<Jewel> {
                 matches,
                 applyGravity(),
                 refillBoard(),
-                scoreSystem.score,
+                getScore(),
                 getNewBoardIfNecessary()
             )
 
             matches = MatchDetect.detect(this)
         }
 
-        return result.distinct()
+        return result
     }
 
     private fun getNewBoardIfNecessary(): MutableMap<JewelPos, Jewel> {

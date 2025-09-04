@@ -10,9 +10,13 @@ import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
 import org.cluelesshog.game.logic.SwapResult
-import kotlin.collections.forEach
 
-class BoardView(private val board: Board, private val scoreView: ScoreView, width: Float, height: Float) : Group() {
+class BoardView(
+    private val board: Board,
+    private val scoreView: ScoreView,
+    width: Float,
+    height: Float
+) : Group() {
     private var jewelSize = minOf(width / board.columnsCount, height / board.rowsCount)
     private val actors = mutableMapOf<JewelPos, JewelActor>()
     private var previous: JewelActor? = null
@@ -47,15 +51,16 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
     }
 
     private fun gravityAndRefill(swap: SwapResult, onComplete: () -> Unit) {
-        val movedJewels = swap.movedJewels;
-        val newJewels = swap.newJewels;
+        val movedJewels = swap.movedJewels
+        val newJewels = swap.newJewels
         val afterGravityAndRefillTrigger = ThresholdTrigger(newJewels.size + movedJewels.size) {
-            refillActors(swap.newBoard) {
+            refreshBoardIfNotPossibleMoves(swap.newBoard) {
                 enableInput()
                 onComplete()
             }
         }
 
+        // Гравитация
         for ((pos, step) in movedJewels) {
             val newPos = JewelPos(pos.column, pos.row - step)
             val actor = actors[pos]!!
@@ -73,6 +78,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
             )
         }
 
+        // Добавление новых камней на место упавших
         for (it in newJewels) {
             val newActor = getJewelImage(it)
             actors[it.pos] = newActor
@@ -93,7 +99,10 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         }
     }
 
-    private fun refillActors(newBoard: Map<JewelPos, Jewel>, onRefill: () -> Unit) {
+    private fun refreshBoardIfNotPossibleMoves(
+        newBoard: Map<JewelPos, Jewel>,
+        onRefill: () -> Unit
+    ) {
         newBoard.ifEmpty {
             onRefill()
             return
@@ -137,7 +146,7 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
     private fun getJewelImage(jewel: Jewel): JewelActor {
         val actor = JewelActor(jewel, jewelSize)
 
-        actor.onClick{ clickOnJewel(this) }
+        actor.onClick { clickOnJewel(this) }
 
         return actor
     }
@@ -172,7 +181,14 @@ class BoardView(private val board: Board, private val scoreView: ScoreView, widt
         val firstPos = first.x to first.y
         val secondPos = second.x to second.y
 
-        first.addAction(Actions.moveTo(secondPos.first, secondPos.second, 0.3f, Interpolation.exp10Out))
+        first.addAction(
+            Actions.moveTo(
+                secondPos.first,
+                secondPos.second,
+                0.3f,
+                Interpolation.exp10Out
+            )
+        )
 
         second.addAction(
             Actions.sequence(
