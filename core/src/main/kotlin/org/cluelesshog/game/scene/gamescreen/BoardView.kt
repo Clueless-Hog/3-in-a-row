@@ -55,7 +55,13 @@ class BoardView(
         val movedJewels = swap.movedJewels
         val newJewels = swap.newJewels
 
-        val afterGravityTrigger = ThresholdTrigger(newJewels.size + movedJewels.size, onComplete)
+        val afterGravityTrigger = ThresholdTrigger(newJewels.size + movedJewels.size) {
+            if (swap.refreshed) {
+                refreshBoard(onComplete)
+                return@ThresholdTrigger
+            }
+            onComplete()
+        }
 
         // Гравитация
         for ((pos, step) in movedJewels) {
@@ -96,7 +102,7 @@ class BoardView(
         }
     }
 
-    private fun refreshBoard() {
+    private fun refreshBoard(onComplete: () -> Unit) {
         val clearActorsTrigger = ThresholdTrigger(actors.size) {
             // Заполнение доски новыми камнями + анимация
             board.forEach {
@@ -109,6 +115,7 @@ class BoardView(
                     Actions.sequence(
                         Actions.scaleBy(1.1f, 1.1f, .2f),
                         Actions.scaleBy(-.1f, -.1f, .1f),
+                        Actions.run(onComplete)
                     )
                 )
             }
@@ -197,10 +204,6 @@ class BoardView(
         onSwap(combination) {
             enableInput()
             handleSwapResult(swap)
-
-            if (combination.refreshed && swap.isEmpty()) {
-                refreshBoard()
-            }
         }
     }
 
