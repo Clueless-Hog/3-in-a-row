@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 
@@ -29,7 +29,25 @@ class BoardTest {
 
     @Test
     fun testSwapHappens() {
-        assertTrue(board.swap(JewelPos(2, 1), JewelPos(2, 0)))
+        var result = board.swap(JewelPos(2, 1), JewelPos(2, 0))
+        assertTrue(result.isNotEmpty())
+
+        assertMatches(
+            listOf(
+                JewelPos(0, 0),
+                JewelPos(1, 0),
+                JewelPos(2, 0)
+            ), result[0]
+        )
+        assertJewelsFellDown(result[0])
+        assertNewJewels(
+            listOf(
+                Jewel(JewelPos(0, 2), DIAMOND),
+                Jewel(JewelPos(1, 2), EMERALD),
+                Jewel(JewelPos(2, 2), AMETHYST)
+            ), result[0]
+        )
+
         assertEqualsBoardOf(
             arrayOf(
                 "DEA",
@@ -37,9 +55,26 @@ class BoardTest {
                 "RDR"
             ), board
         )
-        assertEquals(board.getScore(), 30)
+        assertEquals(30, result[0].scoreUp)
 
-        assertTrue(board.swap(JewelPos(1, 1), JewelPos(1, 0)))
+        result = board.swap(JewelPos(1, 1), JewelPos(1, 0))
+
+        assertMatches(
+            listOf(
+                JewelPos(0, 0),
+                JewelPos(1, 0),
+                JewelPos(2, 0)
+            ), result[0]
+        )
+        assertJewelsFellDown(result[0])
+        assertNewJewels(
+            listOf(
+                Jewel(JewelPos(0, 2), EMERALD),
+                Jewel(JewelPos(1, 2), DIAMOND),
+                Jewel(JewelPos(2, 2), EMERALD)
+            ), result[0]
+        )
+
         assertEqualsBoardOf(
             arrayOf(
                 "EDE",
@@ -47,7 +82,47 @@ class BoardTest {
                 "EDD"
             ), board
         )
-        assertEquals(board.getScore(), 90)
+        assertEquals(90, result[0].scoreUp)
+    }
+
+    private fun assertNewJewels(
+        expected: List<Jewel>,
+        actual: SwapResult
+    ) {
+        assertEquals(expected, actual.newJewels)
+    }
+
+    private fun assertMatches(
+        expected: List<JewelPos>,
+        actual: SwapResult
+    ) {
+        assertEquals(expected, actual.matches)
+    }
+
+    private fun assertEquals(
+        expected: Collection<Any>,
+        actual: Collection<Any>
+    ) {
+        fun <T> Collection<T>.frequencyMap(): Map<T, Int> =
+            this.groupingBy { it }.eachCount()
+
+        val expectedFreq = expected.frequencyMap()
+        val actualFreq = actual.frequencyMap()
+
+        assertEquals(expectedFreq, actualFreq)
+    }
+
+    private fun assertJewelsFellDown(result: SwapResult) {
+        val matches = result.matches
+        val movedJewels = result.movedJewels
+
+        val matchesByCol = matches.groupBy { it.column }.mapValues { entry -> entry.value.map { it.row } }
+
+        for ((pos, steps) in movedJewels) {
+            val matchRowsInCol = matchesByCol[pos.column] ?: emptyList()
+            val matchesBelow = matchRowsInCol.count { it < pos.row }
+            assertEquals(matchesBelow, steps)
+        }
     }
 
     @Test
@@ -60,27 +135,23 @@ class BoardTest {
     private fun checkInvalidSwap(first: JewelPos, second: JewelPos) {
         val previousBoard = board.map { it.copy() }
 
-        assertFalse(board.swap(first, second))
+        assertFalse(board.swap(first, second).isNotEmpty())
 
         val currentBoard = board.map { it.copy() }
-        assertEquals(previousBoard, currentBoard)
+        kotlin.test.assertEquals(previousBoard, currentBoard)
     }
 
-    private fun gridOf(vararg rows: Map<JewelPos, Jewel>): MutableMap<JewelPos, Jewel> {
-        return rows
-            .flatMap { it.entries }
-            .associate { it.toPair() }
-            .toMutableMap()
-    }
+    private fun gridOf(vararg rows: Map<JewelPos, Jewel>) = rows
+        .flatMap { it.entries }
+        .associate { it.toPair() }
+        .toMutableMap()
 
-    private fun rowOf(vararg types: JewelType, row: Int): Map<JewelPos, Jewel> {
-        return types
-            .mapIndexed { col, type ->
-                val pos = JewelPos(col, row)
-                Pair(pos, Jewel(pos, type))
-            }
-            .toMap()
-    }
+    private fun rowOf(vararg types: JewelType, row: Int) = types
+        .mapIndexed { col, type ->
+            val pos = JewelPos(col, row)
+            Pair(pos, Jewel(pos, type))
+        }
+        .toMap()
 
     private fun assertEqualsBoardOf(expected: Array<String>, actual: Board) {
         val expectedBoard = squareBoardOf(*expected)
@@ -97,17 +168,7 @@ class BoardTest {
         }
     }
 
-    private fun fromCharOrThrow(c: String): JewelType {
-        return when (c) {
-            "D" -> DIAMOND
-            "R" -> RUBY
-            "E" -> EMERALD
-            "A" -> AMETHYST
-            else -> error("Unknown JewelType: $c")
-        }
-    }
-
-    fun squareBoardOf(vararg lines: String): Board {
+    private fun squareBoardOf(vararg lines: String): Board {
         require(lines.all { it.length == lines.size })
 
         val rows = lines.mapIndexed { arrayIndex, line ->
@@ -117,6 +178,14 @@ class BoardTest {
         }.toTypedArray()
 
         return Board(gridOf(*rows))
+    }
+
+    private fun fromCharOrThrow(c: String) = when (c) {
+        "D" -> DIAMOND
+        "R" -> RUBY
+        "E" -> EMERALD
+        "A" -> AMETHYST
+        else -> error("Unknown JewelType: $c")
     }
 
 }

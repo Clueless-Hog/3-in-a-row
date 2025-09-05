@@ -19,7 +19,7 @@ class GameScreen : Scene() {
 
     override fun load(): Boolean {
         model = Board(rows, columns)
-        score = ScoreView(model)
+        score = ScoreView()
         view = BoardView(model, score, boardSize, boardSize)
 
         wrapper.addActor(view)
