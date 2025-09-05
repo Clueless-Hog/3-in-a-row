@@ -30,6 +30,7 @@ class BoardView(
             actors[jewel.pos] = actor
         }
 
+        // Анимация падения камней, во время которой заблокирован ввод
         val initTrigger = ThresholdTrigger(board.count()) {
             enableInput()
         }
@@ -50,15 +51,11 @@ class BoardView(
         setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
     }
 
-    private fun gravityAndRefill(swap: SwapResult, onComplete: () -> Unit) {
+    private fun applyGravity(swap: SwapResult, onComplete: () -> Unit) {
         val movedJewels = swap.movedJewels
         val newJewels = swap.newJewels
-        val afterGravityAndRefillTrigger = ThresholdTrigger(newJewels.size + movedJewels.size) {
-            refreshBoardIfNotPossibleMoves(swap.newBoard) {
-                enableInput()
-                onComplete()
-            }
-        }
+
+        val afterGravityTrigger = ThresholdTrigger(newJewels.size + movedJewels.size, onComplete)
 
         // Гравитация
         for ((pos, step) in movedJewels) {
@@ -72,7 +69,7 @@ class BoardView(
                 Actions.sequence(
                     Actions.moveBy(0f, -(step * jewelSize), .7f, Interpolation.exp10Out),
                     Actions.run {
-                        afterGravityAndRefillTrigger.attempt()
+                        afterGravityTrigger.attempt()
                     }
                 )
             )
@@ -92,42 +89,31 @@ class BoardView(
                 Actions.sequence(
                     Actions.moveTo(toX, toY, .7f, Interpolation.exp10Out),
                     Actions.run {
-                        afterGravityAndRefillTrigger.attempt()
+                        afterGravityTrigger.attempt()
                     }
                 )
             )
         }
     }
 
-    private fun refreshBoardIfNotPossibleMoves(
-        newBoard: Map<JewelPos, Jewel>,
-        onRefill: () -> Unit
-    ) {
-        newBoard.ifEmpty {
-            onRefill()
-            return
-        }
-
-        val onCompleteTrigger = ThresholdTrigger(actors.size, onRefill)
-
+    private fun refreshBoard() {
         val clearActorsTrigger = ThresholdTrigger(actors.size) {
-            for ((pos, jewel) in newBoard) {
-                val newActor = getJewelImage(jewel)
+            // Заполнение доски новыми камнями + анимация
+            board.forEach {
+                val newActor = getJewelImage(it)
                 newActor.scaleBy(-1f, -1f)
                 addActor(newActor)
-                actors[pos] = newActor
+                actors[it.pos] = newActor
+
                 newActor.addAction(
                     Actions.sequence(
                         Actions.scaleBy(1.1f, 1.1f, .2f),
                         Actions.scaleBy(-.1f, -.1f, .1f),
-                        Actions.run {
-                            onCompleteTrigger.attempt()
-                        }
                     )
                 )
             }
         }
-
+        // Удаление всех камней + анимация
         actors.values.forEach {
             it.addAction(
                 Actions.sequence(
@@ -181,6 +167,8 @@ class BoardView(
         val firstPos = first.x to first.y
         val secondPos = second.x to second.y
 
+        disableInput()
+        // Анимация свапа
         first.addAction(
             Actions.moveTo(
                 secondPos.first,
@@ -193,7 +181,10 @@ class BoardView(
         second.addAction(
             Actions.sequence(
                 Actions.moveTo(firstPos.first, firstPos.second, 0.3f, Interpolation.exp10Out),
-                Actions.run { handleSwapResult(result) }
+                Actions.run {
+                    enableInput()
+                    handleSwapResult(result)
+                }
             )
         )
     }
@@ -201,18 +192,19 @@ class BoardView(
     private fun handleSwapResult(swap: ArrayDeque<SwapResult>) {
         val combination = swap.removeFirstOrNull() ?: return
 
+        disableInput()
+
         onSwap(combination) {
+            enableInput()
             handleSwapResult(swap)
+
+            if (combination.refreshed && swap.isEmpty()) {
+                refreshBoard()
+            }
         }
     }
 
-    private fun onSwap(combination: SwapResult?, onComplete: () -> Unit) {
-        if (combination === null) {
-            return
-        }
-
-        disableInput()
-
+    private fun onSwap(combination: SwapResult, onComplete: () -> Unit) {
         val completionTrigger = ThresholdTrigger(combination.matches.size) {
             onSwapFinished(combination, onComplete)
         }
@@ -237,7 +229,7 @@ class BoardView(
     private fun onSwapFinished(combination: SwapResult, onComplete: () -> Unit) {
         scoreView.update(combination.scoreUp)
 
-        gravityAndRefill(combination, onComplete)
+        applyGravity(combination, onComplete)
     }
 
     private fun disableInput() {

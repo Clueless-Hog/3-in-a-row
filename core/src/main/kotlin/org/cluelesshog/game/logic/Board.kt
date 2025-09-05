@@ -56,12 +56,22 @@ class Board : Iterable<Jewel> {
         var matches = MatchDetect.detect(this)
         while (matches.isNotEmpty()) {
             destroyJewels(matches)
+
+            val movedJewels = applyGravity()
+            val newJewels = refillBoard()
+            var refreshed = false
+
+            while (!hasPossibleMoves()) {
+                randomRefill()
+                refreshed = true
+            }
+
             result += SwapResult(
                 matches,
-                applyGravity(),
-                refillBoard(),
+                movedJewels,
+                newJewels,
                 getScore(),
-                getNewBoardIfNecessary()
+                refreshed
             )
 
             matches = MatchDetect.detect(this)
@@ -70,17 +80,7 @@ class Board : Iterable<Jewel> {
         return result
     }
 
-    private fun getNewBoardIfNecessary(): MutableMap<JewelPos, Jewel> {
-        var result = mutableMapOf<JewelPos, Jewel>()
-
-        while (!hasPossibleMoves()) {
-            result = randomRefill()
-        }
-
-        return result
-    }
-
-    private fun hasPossibleMoves(): Boolean {
+    fun hasPossibleMoves(): Boolean {
         for (jewel in grid.values) {
             for (neighbor in getNeighbors(jewel)) {
                 if (checkMatch(jewel, neighbor)) return true

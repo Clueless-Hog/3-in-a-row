@@ -30,22 +30,24 @@ class BoardTest {
     @Test
     fun testSwapHappens() {
         var result = board.swap(JewelPos(2, 1), JewelPos(2, 0))
-        assertEquals(
+        assertTrue(result.isNotEmpty())
+
+        assertMatches(
             listOf(
                 JewelPos(0, 0),
                 JewelPos(1, 0),
                 JewelPos(2, 0)
-            ), result[0].matches
+            ), result[0]
         )
-        assertJewelsFellDown(result[0].matches, result[0].movedJewels)
-        assertEquals(
+        assertJewelsFellDown(result[0])
+        assertNewJewels(
             listOf(
                 Jewel(JewelPos(0, 2), DIAMOND),
                 Jewel(JewelPos(1, 2), EMERALD),
                 Jewel(JewelPos(2, 2), AMETHYST)
-            ), result[0].newJewels
+            ), result[0]
         )
-        assertTrue(result.isNotEmpty())
+
         assertEqualsBoardOf(
             arrayOf(
                 "DEA",
@@ -53,24 +55,26 @@ class BoardTest {
                 "RDR"
             ), board
         )
-        assertEquals(board.getScore(), 30)
+        assertEquals(30, result[0].scoreUp)
 
         result = board.swap(JewelPos(1, 1), JewelPos(1, 0))
-        assertEquals(
+
+        assertMatches(
             listOf(
                 JewelPos(0, 0),
                 JewelPos(1, 0),
                 JewelPos(2, 0)
-            ), result[0].matches
+            ), result[0]
         )
-        assertJewelsFellDown(result[0].matches, result[0].movedJewels)
-        assertEquals(
+        assertJewelsFellDown(result[0])
+        assertNewJewels(
             listOf(
                 Jewel(JewelPos(0, 2), EMERALD),
                 Jewel(JewelPos(1, 2), DIAMOND),
                 Jewel(JewelPos(2, 2), EMERALD)
-            ), result[0].newJewels
+            ), result[0]
         )
+
         assertEqualsBoardOf(
             arrayOf(
                 "EDE",
@@ -78,7 +82,21 @@ class BoardTest {
                 "EDD"
             ), board
         )
-        assertEquals(board.getScore(), 90)
+        assertEquals(90, result[0].scoreUp)
+    }
+
+    private fun assertNewJewels(
+        expected: List<Jewel>,
+        actual: SwapResult
+    ) {
+        assertEquals(expected, actual.newJewels)
+    }
+
+    private fun assertMatches(
+        expected: List<JewelPos>,
+        actual: SwapResult
+    ) {
+        assertEquals(expected, actual.matches)
     }
 
     private fun assertEquals(
@@ -94,7 +112,10 @@ class BoardTest {
         assertEquals(expectedFreq, actualFreq)
     }
 
-    private fun assertJewelsFellDown(matches: List<JewelPos>, movedJewels: Map<JewelPos, Int>) {
+    private fun assertJewelsFellDown(result: SwapResult) {
+        val matches = result.matches
+        val movedJewels = result.movedJewels
+
         val matchesByCol = matches.groupBy { it.column }.mapValues { entry -> entry.value.map { it.row } }
 
         for ((pos, steps) in movedJewels) {

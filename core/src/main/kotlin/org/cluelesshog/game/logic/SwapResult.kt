@@ -5,5 +5,5 @@ data class SwapResult(
     val movedJewels: Map<JewelPos, Int>,
     val newJewels: List<Jewel>,
     val scoreUp: Int,
-    val newBoard: Map<JewelPos, Jewel>
+    val refreshed: Boolean
 )
