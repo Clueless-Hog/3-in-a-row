@@ -10,14 +10,18 @@ object SoundUtils {
     fun getSound(type: SoundType) =
         cache.getOrPut(type) {
             when (type) {
-                SoundType.SWAP -> AssetLoader.getSound("swap1")
-                SoundType.MATCH -> AssetLoader.getSound("zvuk2")
-                SoundType.FALL -> AssetLoader.getSound("zvuk3")
+                SoundType.SWAP -> AssetLoader.getSound("zvuk3")
+                SoundType.MATCH -> AssetLoader.getSound("swap1")
+                SoundType.FALL -> AssetLoader.getSound("zvuk2")
             }
         }
 
     fun playSound(type: SoundType, volume: Float) {
         getSound(type).play(volume)
+    }
+
+    fun playSound(type: SoundType, volume: Float = 1f, pitch: Float) {
+        getSound(type).play(volume, pitch, 0f)
     }
 
     fun playSound(type: SoundType) {

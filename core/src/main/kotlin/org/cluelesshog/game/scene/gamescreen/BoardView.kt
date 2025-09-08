@@ -22,6 +22,7 @@ class BoardView(
     private val actors = mutableMapOf<JewelPos, JewelActor>()
     private var previous: JewelActor? = null
     private val boardTop = board.rowsCount * jewelSize
+    private var currentCombo = 1f
 
     init {
         disableInput()
@@ -63,8 +64,6 @@ class BoardView(
                 onComplete()
             }
         }
-
-        SoundUtils.playSound(SoundType.FALL)
 
         // Гравитация
         for ((pos, step) in movedJewels) {
@@ -216,7 +215,11 @@ class BoardView(
     }
 
     private fun handleMatches(matches: ArrayDeque<Match>) {
-        val match = matches.removeFirstOrNull() ?: return
+        val match = matches.removeFirstOrNull()
+        if (match == null) {
+            currentCombo = 1f
+            return
+        }
 
         disableInput()
 
@@ -230,9 +233,9 @@ class BoardView(
         val completionTrigger = ThresholdTrigger(match.matches.size) {
             onJewelsDestroyed(match, onComplete)
         }
-
+        currentCombo += 0.3f
         // Удаление всех совпавших камней
-        SoundUtils.playSound(SoundType.MATCH)
+        SoundUtils.playSound(SoundType.MATCH, pitch = currentCombo)
         match.matches.forEach { pos ->
             val actor = actors[pos]!!
             actors.remove(pos)
