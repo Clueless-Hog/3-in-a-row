@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import engine.ThresholdTrigger
 import ktx.actors.onClick
+import org.cluelesshog.game.asset.SoundUtils
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
@@ -72,10 +73,15 @@ class BoardView(
             actors.remove(pos)
 
             actor.addAction(
-                Actions.sequence(
-                    Actions.moveBy(0f, -(step * jewelSize), .7f, Interpolation.exp10Out),
+                Actions.parallel(
+                    Actions.sequence(
+                        Actions.moveBy(0f, -(step * jewelSize), .7f, Interpolation.exp10Out),
+                        Actions.run {
+                            afterGravityTrigger.attempt()
+                        }
+                    ),
                     Actions.run {
-                        afterGravityTrigger.attempt()
+                        SoundUtils.playSound(SoundType.FALL)
                     }
                 )
             )
@@ -92,10 +98,15 @@ class BoardView(
             newActor.y = boardTop + (jewelSize * newActor.pos.row)
             addActor(newActor)
             newActor.addAction(
-                Actions.sequence(
-                    Actions.moveTo(toX, toY, .7f, Interpolation.exp10Out),
+                Actions.parallel(
+                    Actions.sequence(
+                        Actions.moveTo(toX, toY, .7f, Interpolation.exp10Out),
+                        Actions.run {
+                            afterGravityTrigger.attempt()
+                        }
+                    ),
                     Actions.run {
-                        afterGravityTrigger.attempt()
+                        SoundUtils.playSound(SoundType.FALL)
                     }
                 )
             )
@@ -175,6 +186,9 @@ class BoardView(
         val secondPos = second.x to second.y
 
         disableInput()
+
+        SoundUtils.playSound(SoundType.SWAP)
+
         // Анимация свапа
         first.addAction(
             Actions.moveTo(
@@ -216,15 +230,20 @@ class BoardView(
             val actor = actors[pos]!!
             actors.remove(pos)
             actor.addAction(
-                Actions.sequence(
-                    Actions.scaleBy(.1f, .1f, .1f),
-                    Actions.scaleBy(-1f, -1f, .2f),
-                    Actions.fadeOut(.1f),
+                Actions.parallel(
+                    Actions.sequence(
+                        Actions.scaleBy(.1f, .1f, .1f),
+                        Actions.scaleBy(-1f, -1f, .2f),
+                        Actions.fadeOut(.1f),
+                        Actions.run {
+                            completionTrigger.attempt()
+                            actor.remove()
+                        },
+                    ),
                     Actions.run {
-                        completionTrigger.attempt()
-                        actor.remove()
-                    },
-                )
+                        SoundUtils.playSound(SoundType.MATCH)
+                    }
+                ),
             )
         }
     }
