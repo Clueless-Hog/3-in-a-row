@@ -74,17 +74,12 @@ class BoardView(
             actors.remove(pos)
 
             actor.addAction(
-                Actions.parallel(
-                    Actions.sequence(
-                        Actions.moveBy(0f, -(step * jewelSize), .7f, Interpolation.exp10Out),
-                        Actions.run {
-                            afterGravityTrigger.attempt()
-                        }
-                    ),
+                Actions.sequence(
+                    Actions.moveBy(0f, -(step * jewelSize), .7f, Interpolation.exp10Out),
                     Actions.run {
-                        SoundUtils.playSound(SoundType.FALL)
+                        afterGravityTrigger.attempt()
                     }
-                ),
+                )
             )
         }
 
@@ -99,15 +94,10 @@ class BoardView(
             newActor.y = boardTop + (jewelSize * newActor.pos.row)
             addActor(newActor)
             newActor.addAction(
-                Actions.parallel(
-                    Actions.sequence(
-                        Actions.moveTo(toX, toY, .7f, Interpolation.exp10Out),
-                        Actions.run {
-                            afterGravityTrigger.attempt()
-                        }
-                    ),
+                Actions.sequence(
+                    Actions.moveTo(toX, toY, .7f, Interpolation.exp10Out),
                     Actions.run {
-                        SoundUtils.playSound(SoundType.FALL)
+                        afterGravityTrigger.attempt()
                     }
                 ),
             )
@@ -240,19 +230,14 @@ class BoardView(
             val actor = actors[pos]!!
             actors.remove(pos)
             actor.addAction(
-                Actions.parallel(
-                    Actions.sequence(
-                        Actions.scaleBy(.1f, .1f, .1f),
-                        Actions.scaleBy(-1f, -1f, .2f),
-                        Actions.fadeOut(.1f),
-                        Actions.run {
-                            completionTrigger.attempt()
-                            actor.remove()
-                        },
-                    ),
+                Actions.sequence(
+                    Actions.scaleBy(.1f, .1f, .1f),
+                    Actions.scaleBy(-1f, -1f, .2f),
+                    Actions.fadeOut(.1f),
                     Actions.run {
-                        SoundUtils.playSound(SoundType.MATCH)
-                    }
+                        completionTrigger.attempt()
+                        actor.remove()
+                    },
                 ),
             )
         }

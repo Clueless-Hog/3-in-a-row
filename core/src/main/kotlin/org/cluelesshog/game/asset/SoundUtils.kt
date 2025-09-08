@@ -12,7 +12,6 @@ object SoundUtils {
             when (type) {
                 SoundType.SWAP -> AssetLoader.getSound("zvuk3")
                 SoundType.MATCH -> AssetLoader.getSound("swap1")
-                SoundType.FALL -> AssetLoader.getSound("zvuk2")
             }
         }
 
