@@ -6,10 +6,11 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import engine.ThresholdTrigger
 import ktx.actors.onClick
+import org.cluelesshog.game.asset.SoundUtils
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
-import org.cluelesshog.game.logic.SwapResult
+import org.cluelesshog.game.logic.Match
 
 class BoardView(
     private val board: Board,
@@ -21,6 +22,7 @@ class BoardView(
     private val actors = mutableMapOf<JewelPos, JewelActor>()
     private var previous: JewelActor? = null
     private val boardTop = board.rowsCount * jewelSize
+    private var currentCombo = 1f
 
     init {
         disableInput()
@@ -51,16 +53,16 @@ class BoardView(
         setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
     }
 
-    private fun applyGravity(swap: SwapResult, onComplete: () -> Unit) {
-        val movedJewels = swap.movedJewels
-        val newJewels = swap.newJewels
+    private fun applyGravity(match: Match, onComplete: () -> Unit) {
+        val movedJewels = match.movedJewels
+        val newJewels = match.newJewels
 
         val afterGravityTrigger = ThresholdTrigger(newJewels.size + movedJewels.size) {
-            if (swap.refreshed) {
+            if (match.refreshed) {
                 refreshBoard(onComplete)
-                return@ThresholdTrigger
+            } else {
+                onComplete()
             }
-            onComplete()
         }
 
         // Гравитация
@@ -97,7 +99,7 @@ class BoardView(
                     Actions.run {
                         afterGravityTrigger.attempt()
                     }
-                )
+                ),
             )
         }
     }
@@ -120,6 +122,9 @@ class BoardView(
                 )
             }
         }
+
+        SoundUtils.playSound(SoundType.MATCH)
+
         // Удаление всех камней + анимация
         actors.values.forEach {
             it.addAction(
@@ -175,6 +180,9 @@ class BoardView(
         val secondPos = second.x to second.y
 
         disableInput()
+
+        SoundUtils.playSound(SoundType.SWAP)
+
         // Анимация свапа
         first.addAction(
             Actions.moveTo(
@@ -190,29 +198,35 @@ class BoardView(
                 Actions.moveTo(firstPos.first, firstPos.second, 0.3f, Interpolation.exp10Out),
                 Actions.run {
                     enableInput()
-                    handleSwapResult(result)
+                    handleMatches(result)
                 }
             )
         )
     }
 
-    private fun handleSwapResult(swap: ArrayDeque<SwapResult>) {
-        val combination = swap.removeFirstOrNull() ?: return
+    private fun handleMatches(matches: ArrayDeque<Match>) {
+        val match = matches.removeFirstOrNull()
+        if (match == null) {
+            currentCombo = 1f
+            return
+        }
 
         disableInput()
 
-        onSwap(combination) {
+        onMatch(match) {
             enableInput()
-            handleSwapResult(swap)
+            handleMatches(matches)
         }
     }
 
-    private fun onSwap(combination: SwapResult, onComplete: () -> Unit) {
-        val completionTrigger = ThresholdTrigger(combination.matches.size) {
-            onSwapFinished(combination, onComplete)
+    private fun onMatch(match: Match, onComplete: () -> Unit) {
+        val completionTrigger = ThresholdTrigger(match.matches.size) {
+            onJewelsDestroyed(match, onComplete)
         }
-
-        combination.matches.forEach { pos ->
+        currentCombo += 0.3f
+        // Удаление всех совпавших камней
+        SoundUtils.playSound(SoundType.MATCH, pitch = currentCombo)
+        match.matches.forEach { pos ->
             val actor = actors[pos]!!
             actors.remove(pos)
             actor.addAction(
@@ -224,15 +238,15 @@ class BoardView(
                         completionTrigger.attempt()
                         actor.remove()
                     },
-                )
+                ),
             )
         }
     }
 
-    private fun onSwapFinished(combination: SwapResult, onComplete: () -> Unit) {
-        scoreView.update(combination.scoreUp)
+    private fun onJewelsDestroyed(match: Match, onComplete: () -> Unit) {
+        scoreView.update(match.scoreUp)
 
-        applyGravity(combination, onComplete)
+        applyGravity(match, onComplete)
     }
 
     private fun disableInput() {

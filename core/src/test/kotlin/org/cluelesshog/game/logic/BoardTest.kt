@@ -87,14 +87,14 @@ class BoardTest {
 
     private fun assertNewJewels(
         expected: List<Jewel>,
-        actual: SwapResult
+        actual: Match
     ) {
         assertEquals(expected, actual.newJewels)
     }
 
     private fun assertMatches(
         expected: List<JewelPos>,
-        actual: SwapResult
+        actual: Match
     ) {
         assertEquals(expected, actual.matches)
     }
@@ -112,7 +112,7 @@ class BoardTest {
         assertEquals(expectedFreq, actualFreq)
     }
 
-    private fun assertJewelsFellDown(result: SwapResult) {
+    private fun assertJewelsFellDown(result: Match) {
         val matches = result.matches
         val movedJewels = result.movedJewels
 

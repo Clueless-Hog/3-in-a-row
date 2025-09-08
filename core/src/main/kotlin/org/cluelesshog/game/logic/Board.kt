@@ -37,8 +37,8 @@ class Board : Iterable<Jewel> {
 
     fun getScore() = scoreSystem.score
 
-    fun swap(firstPos: JewelPos, secondPos: JewelPos): List<SwapResult> {
-        val result = mutableListOf<SwapResult>()
+    fun swap(firstPos: JewelPos, secondPos: JewelPos): List<Match> {
+        val result = mutableListOf<Match>()
         val first = getJewel(firstPos)
         val second = getJewel(secondPos)
 
@@ -66,7 +66,7 @@ class Board : Iterable<Jewel> {
                 refreshed = true
             }
 
-            result += SwapResult(
+            result += Match(
                 matches,
                 movedJewels,
                 newJewels,
