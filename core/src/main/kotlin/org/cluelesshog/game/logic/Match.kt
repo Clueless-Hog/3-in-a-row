@@ -1,6 +1,6 @@
 package org.cluelesshog.game.logic
 
-data class SwapResult(
+data class Match(
     val matches: List<JewelPos>,
     val movedJewels: Map<JewelPos, Int>,
     val newJewels: List<Jewel>,
