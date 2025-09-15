@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import engine.ThresholdTrigger
 import ktx.actors.onClick
-import org.cluelesshog.game.asset.SoundUtils
+import org.cluelesshog.game.asset.SoundManager
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
@@ -51,6 +51,15 @@ class BoardView(
             )
         }
         setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
+    }
+
+    fun resize(newWidth: Float, newHeight: Float) {
+        setSize(newWidth, newHeight)
+        jewelSize = minOf(width / board.columnsCount, height / board.rowsCount)
+        children.forEach {
+            val actor = it as JewelActor
+            actor.resize(jewelSize)
+        }
     }
 
     private fun applyGravity(match: Match, onComplete: () -> Unit) {
@@ -123,7 +132,7 @@ class BoardView(
             }
         }
 
-        SoundUtils.playSound(SoundType.MATCH)
+        SoundManager.playSound(SoundType.MATCH)
 
         // Удаление всех камней + анимация
         actors.values.forEach {
@@ -181,7 +190,7 @@ class BoardView(
 
         disableInput()
 
-        SoundUtils.playSound(SoundType.SWAP)
+        SoundManager.playSound(SoundType.SWAP)
 
         // Анимация свапа
         first.addAction(
@@ -225,7 +234,7 @@ class BoardView(
         }
         currentCombo += 0.3f
         // Удаление всех совпавших камней
-        SoundUtils.playSound(SoundType.MATCH, pitch = currentCombo)
+        SoundManager.playSound(SoundType.MATCH, pitch = currentCombo)
         match.matches.forEach { pos ->
             val actor = actors[pos]!!
             actors.remove(pos)

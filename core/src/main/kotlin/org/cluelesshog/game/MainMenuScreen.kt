@@ -1,10 +1,11 @@
 package org.cluelesshog.game
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import ktx.actors.onClick
+import org.cluelesshog.game.asset.SoundManager
 import org.cluelesshog.game.scene.gamescreen.GameScreen
+import org.cluelesshog.game.scene.gamescreen.SoundType
 
 class MainMenuScreen : Scene() {
     init {
@@ -12,14 +13,14 @@ class MainMenuScreen : Scene() {
         table.setFillParent(true)
         wrapper.addActor(table)
 
-        val button = TextButton("Start Game", theme)
-        button.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                SceneController.set<GameScreen>()
-            }
-        })
+        val start = TextButton("Start Game", theme)
 
-        table.add(button).width(200f).height(50f)
+        start.onClick {
+            SoundManager.playSound(SoundType.CLICK)
+            SceneController.set<GameScreen>()
+        }
+
+        table.add(start).width(200f).height(50f).padBottom(10f)
     }
 
     override fun load(): Boolean {

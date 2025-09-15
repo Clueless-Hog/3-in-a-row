@@ -3,13 +3,14 @@ package org.cluelesshog.game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxScreen
 import org.cluelesshog.game.asset.Theme
 
 abstract class Scene (
     protected val theme : Skin = Theme.default(),
-    protected val wrapper: Stage = Stage(ScreenViewport())
+    protected val wrapper: Stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
 ) : KtxScreen {
     private var isVisible = false
 

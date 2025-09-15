@@ -5,6 +5,7 @@ package org.cluelesshog.game.lwjgl3
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import org.cluelesshog.game.Launcher
+import org.cluelesshog.game.scene.gamescreen.Settings
 
 /** Launches the desktop (LWJGL3) application. */
 fun main() {
@@ -23,7 +24,7 @@ fun main() {
         //// useful for testing performance, but can also be very stressful to some hardware.
         //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
 
-        setWindowedMode(1280, 720)
+        setWindowedMode(Settings.resolution.width, Settings.resolution.height)
 
         setResizable(false)
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
