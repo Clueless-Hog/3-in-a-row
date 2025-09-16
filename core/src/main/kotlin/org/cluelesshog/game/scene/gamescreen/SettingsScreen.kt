@@ -41,7 +41,7 @@ class SettingsScreen : Scene() {
             val counter = Label(Resolution.entries[defaultIndex].toString(), theme)
 
             slider.value = defaultIndex.toFloat()
-            slider.onChangeEvent {
+            slider.onClick {
                 val res = Resolution.entries[value.toInt()]
                 Settings.resolution = res
                 counter.setText(res.toString())
@@ -79,10 +79,6 @@ class SettingsScreen : Scene() {
         wrapper.addActor(table)
 
         return true
-    }
-
-    override fun dispose() {
-        wrapper.dispose()
     }
 
 }

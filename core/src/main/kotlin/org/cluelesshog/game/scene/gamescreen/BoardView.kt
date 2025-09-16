@@ -53,15 +53,6 @@ class BoardView(
         setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
     }
 
-    fun resize(newWidth: Float, newHeight: Float) {
-        setSize(newWidth, newHeight)
-        jewelSize = minOf(width / board.columnsCount, height / board.rowsCount)
-        children.forEach {
-            val actor = it as JewelActor
-            actor.resize(jewelSize)
-        }
-    }
-
     private fun applyGravity(match: Match, onComplete: () -> Unit) {
         val movedJewels = match.movedJewels
         val newJewels = match.newJewels

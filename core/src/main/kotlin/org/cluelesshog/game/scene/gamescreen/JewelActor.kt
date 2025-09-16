@@ -13,14 +13,10 @@ data class JewelActor(
     var pos: JewelPos = jewel.pos,
 ) : Image(loadTextureForJewelType(jewel.type)) {
     init {
-        resize(size)
-        setZIndex(1)
-    }
-
-    fun resize(size: Float) {
         setSize(size, size)
         setPosition(pos.column * width, pos.row * height)
         setOrigin(width / 2, height / 2)
+        setZIndex(1)
     }
 
     fun highlight() {

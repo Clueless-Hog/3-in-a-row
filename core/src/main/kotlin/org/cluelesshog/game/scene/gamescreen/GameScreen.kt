@@ -30,7 +30,6 @@ class GameScreen : Scene() {
 
     override fun load(): Boolean {
         Settings.addObserver(::resolutionObserver)
-        Settings.addObserver(::fullscreenObserver)
 
         model = Board(rows, columns)
         score = ScoreView()
@@ -58,29 +57,14 @@ class GameScreen : Scene() {
         return true
     }
 
-    private fun fullscreenObserver(settings: Settings) {
-        if (settings.fullscreen) {
-            Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
-            view.resize(boardSize, boardSize)
-            updateViewport()
-        } else {
-            setResolution(settings.resolution)
-        }
-    }
-
     private fun resolutionObserver(settings: Settings) {
-        setResolution(settings.resolution)
-        view.resize(boardSize, boardSize)
-        updateViewport()
-    }
+        val switchedToFullscreen = settings.fullscreen && !Gdx.graphics.isFullscreen
+        if (switchedToFullscreen) {
+            Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+        } else {
+            Gdx.graphics.setWindowedMode(settings.resolution.width, settings.resolution.height)
+        }
 
-    private fun setResolution(res: Resolution) {
-        Gdx.graphics.setWindowedMode(res.width, res.height)
-//        updateViewport()
-        resize(res.width, res.height)
-    }
-
-    private fun updateViewport() {
-        wrapper.viewport.update(Gdx.graphics.width, Gdx.graphics.height, true)
+        resize(settings.resolution.width, settings.resolution.height)
     }
 }
