@@ -32,7 +32,7 @@ subprojects {
 
     extensions.configure<JavaPluginExtension> {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
+            languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
 
@@ -77,7 +77,7 @@ subprojects {
     }
 
     tasks.withType<KotlinCompile> {
-        compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
     }
 
     version = projectVersion

@@ -10,7 +10,7 @@ import org.cluelesshog.game.asset.Theme
 
 abstract class Scene (
     protected val theme : Skin = Theme.default(),
-    protected val wrapper: Stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+    protected val wrapper: Stage = Stage(ScreenViewport())
 ) : KtxScreen {
     private var isVisible = false
 

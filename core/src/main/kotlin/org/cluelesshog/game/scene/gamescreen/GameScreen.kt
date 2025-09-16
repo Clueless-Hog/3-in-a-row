@@ -61,8 +61,8 @@ class GameScreen : Scene() {
     private fun fullscreenObserver(settings: Settings) {
         if (settings.fullscreen) {
             Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
-            updateViewport()
             view.resize(boardSize, boardSize)
+            updateViewport()
         } else {
             setResolution(settings.resolution)
         }
@@ -70,12 +70,14 @@ class GameScreen : Scene() {
 
     private fun resolutionObserver(settings: Settings) {
         setResolution(settings.resolution)
-        updateViewport()
         view.resize(boardSize, boardSize)
+        updateViewport()
     }
 
     private fun setResolution(res: Resolution) {
         Gdx.graphics.setWindowedMode(res.width, res.height)
+//        updateViewport()
+        resize(res.width, res.height)
     }
 
     private fun updateViewport() {

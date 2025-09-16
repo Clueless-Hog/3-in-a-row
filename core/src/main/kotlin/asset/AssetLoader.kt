@@ -8,17 +8,19 @@ import com.badlogic.gdx.graphics.Texture
 object AssetLoader {
     private val manager = AssetManager()
 
-    private val tileFiles = Gdx.files.internal("tiles").list()
-    private val soundFiles = Gdx.files.internal("sounds").list()
+    private val assetList = Gdx.files.internal("assets.txt")
+        .readString()
+        .lines()
+        .filter { it.isNotBlank() }
 
     init {
-        for (file in tileFiles) {
-            if (!file.name().endsWith(".png")) continue
-            manager.load(file.path(), Texture::class.java)
-        }
-        for (file in soundFiles) {
-            if (!file.name().endsWith(".wav")) continue
-            manager.load(file.path(), Sound::class.java)
+        assetList.forEach {
+            val file = Gdx.files.internal(it)
+            if (file.name().endsWith(".png")) {
+                manager.load(file.path(), Texture::class.java)
+            } else if (file.name().endsWith(".wav")) {
+                manager.load(file.path(), Sound::class.java)
+            }
         }
 
         manager.finishLoading()
