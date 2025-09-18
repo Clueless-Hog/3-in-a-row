@@ -23,8 +23,5 @@ class MainMenuScreen : Scene() {
         table.add(start).width(200f).height(50f).padBottom(10f)
     }
 
-    override fun load(): Boolean {
-        return true
-    }
-
+    override fun load() = true
 }

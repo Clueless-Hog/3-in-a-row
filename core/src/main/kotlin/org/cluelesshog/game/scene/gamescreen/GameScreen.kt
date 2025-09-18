@@ -14,10 +14,10 @@ import org.cluelesshog.game.asset.SoundManager
 import org.cluelesshog.game.logic.Board
 
 class GameScreen : Scene() {
-    private lateinit var model: Board
-    private lateinit var view: BoardView
-    private lateinit var score: ScoreView
-    private lateinit var settings: Button
+    private var model: Board
+    private var view: BoardView
+    private var score: ScoreView
+    private var settings: Button
 
     private val rows = 8
     private val columns = 8
@@ -25,11 +25,7 @@ class GameScreen : Scene() {
     private val boardSize: Float
         get() = minOf(getScreenWidth() * 0.8f, getScreenHeight() * 0.8f)
 
-    override fun dispose() {
-        wrapper.dispose()
-    }
-
-    override fun load(): Boolean {
+    init {
         Settings.addObserver(::resolutionObserver)
 
         model = Board(rows, columns)
@@ -58,35 +54,35 @@ class GameScreen : Scene() {
         }
 
         wrapper.addActor(root)
-        return true
+    }
+
+    override fun load() = true
+
+    override fun dispose() {
+        wrapper.dispose()
     }
 
     private fun resolutionObserver(settings: Settings) {
-        val switchedToFullscreen = settings.fullscreen && !Gdx.graphics.isFullscreen
         val res = settings.resolution
 
-        if (switchedToFullscreen) {
+        if (settings.fullscreen)
             setResolutionInFullscreen(res)
-        } else {
-            if (settings.fullscreen)
-                setResolutionInFullscreen(res)
-            else
-                Gdx.graphics.setWindowedMode(res.width, res.height)
-        }
+        else
+            Gdx.graphics.setWindowedMode(res.width, res.height)
 
         resize(res.width, res.height)
     }
 
     private fun setResolutionInFullscreen(res: Resolution) {
-        if (Gdx.graphics.supportsDisplayModeChange()) {
-            val currentMonitor = Gdx.graphics.monitor
-            val modes = Gdx.graphics.getDisplayModes(currentMonitor)
+        if (!Gdx.graphics.supportsDisplayModeChange()) return
 
-            for (mode in modes) {
-                if (mode.width == res.width && mode.height == res.height) {
-                    Gdx.graphics.setFullscreenMode(mode)
-                    break
-                }
+        val currentMonitor = Gdx.graphics.monitor
+        val modes = Gdx.graphics.getDisplayModes(currentMonitor)
+
+        for (mode in modes) {
+            if (mode.width == res.width && mode.height == res.height) {
+                Gdx.graphics.setFullscreenMode(mode)
+                break
             }
         }
     }

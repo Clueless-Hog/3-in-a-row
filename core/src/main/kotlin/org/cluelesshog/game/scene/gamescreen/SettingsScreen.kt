@@ -15,7 +15,7 @@ import org.cluelesshog.game.SceneController
 import org.cluelesshog.game.asset.SoundManager
 
 class SettingsScreen : Scene() {
-    override fun load(): Boolean {
+    init {
         val volume = Slider(0f, 1f, 0.01f, false, theme).apply {
             value = 1f
             onChangeEvent {
@@ -79,8 +79,7 @@ class SettingsScreen : Scene() {
         }
 
         wrapper.addActor(root)
-
-        return true
     }
 
+    override fun load() = true
 }
