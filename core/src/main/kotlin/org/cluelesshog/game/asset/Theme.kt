@@ -15,6 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.ui.Window
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.scenes.scene2d.ui.List
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 
 object Theme {
     private const val FONT_SIZE = 24
@@ -81,8 +84,17 @@ object Theme {
 
         // --- CheckBox ---
         skin.add("default", CheckBox.CheckBoxStyle().apply {
-            checkboxOff = skin.newDrawable("white", Color.DARK_GRAY)
-            checkboxOn = skin.newDrawable("white", Color.GREEN)
+            checkboxOff = skin.newDrawable("white", Color.DARK_GRAY).apply {
+                minWidth = 20f
+                minHeight = 20f
+            }
+
+            // Checkmark (green square with white check)
+            checkboxOn = skin.newDrawable("white", Color.GREEN).apply {
+                minWidth = 20f
+                minHeight = 20f
+            }
+
             font = bitmapFont
             fontColor = Color.WHITE
         })
@@ -92,6 +104,36 @@ object Theme {
             titleFont = bitmapFont
             titleFontColor = Color.YELLOW
             background = skin.newDrawable("white", Color.DARK_GRAY)
+        })
+
+        // --- List ---
+        skin.add("default", List.ListStyle().apply {
+            font = bitmapFont
+            fontColorSelected = Color.WHITE
+            fontColorUnselected = Color.LIGHT_GRAY
+            selection = skin.newDrawable("white", Color.BLUE)
+            background = skin.newDrawable("white", Color.DARK_GRAY)
+        })
+
+        // --- ScrollPane ---
+        skin.add("default", ScrollPane.ScrollPaneStyle().apply {
+            background = skin.newDrawable("white", Color.DARK_GRAY)
+            hScroll = skin.newDrawable("white", Color.GRAY).apply { minHeight = 8f }
+            hScrollKnob = skin.newDrawable("white", Color.LIGHT_GRAY).apply { minHeight = 8f; minWidth = 20f }
+            vScroll = skin.newDrawable("white", Color.GRAY).apply { minWidth = 8f }
+            vScrollKnob = skin.newDrawable("white", Color.LIGHT_GRAY).apply { minWidth = 8f; minHeight = 20f }
+        })
+
+        // --- SelectBox ---
+        skin.add("default", SelectBox.SelectBoxStyle().apply {
+            font = bitmapFont
+            fontColor = Color.WHITE
+            background = skin.newDrawable("white", Color.DARK_GRAY)
+            scrollStyle = skin.get("default", ScrollPane.ScrollPaneStyle::class.java)
+            listStyle = skin.get("default", List.ListStyle::class.java)
+            // Optional: different backgrounds for different states
+            backgroundOpen = skin.newDrawable("white", Color.GRAY) // When dropdown is open
+            backgroundOver = skin.newDrawable("white", Color(0.3f, 0.3f, 0.3f, 1f)) // On hover
         })
 
         cachedSkin = skin

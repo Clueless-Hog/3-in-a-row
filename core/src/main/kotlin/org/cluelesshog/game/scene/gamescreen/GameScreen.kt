@@ -3,6 +3,7 @@ package org.cluelesshog.game.scene.gamescreen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.utils.Align
 import ktx.actors.onClick
 import ktx.scene2d.Scene2DSkin
 import ktx.scene2d.scene2d
@@ -32,7 +33,10 @@ class GameScreen : Scene() {
         Settings.addObserver(::resolutionObserver)
 
         model = Board(rows, columns)
+
         score = ScoreView()
+        score.setAlignment(Align.center)
+
         view = BoardView(model, score, boardSize, boardSize)
 
         settings = TextButton("Settings", theme)
@@ -47,7 +51,7 @@ class GameScreen : Scene() {
 
             top().pad(30f)
             add(settings).width(200f).height(50f).left().expandX()
-            add(score).right().expandX()
+            add(score).width(200f)
             row()
 
             add(view).colspan(2).expand().center()
@@ -59,12 +63,32 @@ class GameScreen : Scene() {
 
     private fun resolutionObserver(settings: Settings) {
         val switchedToFullscreen = settings.fullscreen && !Gdx.graphics.isFullscreen
+        val res = settings.resolution
+
         if (switchedToFullscreen) {
-            Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+            setResolutionInFullscreen(res)
         } else {
-            Gdx.graphics.setWindowedMode(settings.resolution.width, settings.resolution.height)
+            if (settings.fullscreen)
+                setResolutionInFullscreen(res)
+            else
+                Gdx.graphics.setWindowedMode(res.width, res.height)
         }
 
-        resize(settings.resolution.width, settings.resolution.height)
+        resize(res.width, res.height)
     }
+
+    private fun setResolutionInFullscreen(res: Resolution) {
+        if (Gdx.graphics.supportsDisplayModeChange()) {
+            val currentMonitor = Gdx.graphics.monitor
+            val modes = Gdx.graphics.getDisplayModes(currentMonitor)
+
+            for (mode in modes) {
+                if (mode.width == res.width && mode.height == res.height) {
+                    Gdx.graphics.setFullscreenMode(mode)
+                    break
+                }
+            }
+        }
+    }
+
 }

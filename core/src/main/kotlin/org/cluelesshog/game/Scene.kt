@@ -72,13 +72,7 @@ abstract class Scene (
         wrapper.dispose()
     }
 
-    protected fun getScreenWidth(): Int
-    {
-        return wrapper.viewport.screenWidth
-    }
+    protected fun getScreenWidth() = wrapper.viewport.screenWidth
 
-    protected fun getScreenHeight(): Int
-    {
-        return wrapper.viewport.screenHeight
-    }
+    protected fun getScreenHeight() = wrapper.viewport.screenHeight
 }
