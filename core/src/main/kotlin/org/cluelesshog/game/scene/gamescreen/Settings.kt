@@ -7,7 +7,7 @@ object Settings {
             notifyObservers()
         }
 
-    var resolution: Resolution = Resolution.MEDIUM
+    var resolution: Resolution = Resolution.SMALL
         set(value) {
             field = value
             notifyObservers()

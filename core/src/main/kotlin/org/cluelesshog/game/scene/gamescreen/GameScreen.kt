@@ -1,6 +1,6 @@
 package org.cluelesshog.game.scene.gamescreen
 
-import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Gdx.graphics
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.Align
@@ -68,23 +68,20 @@ class GameScreen : Scene() {
         if (settings.fullscreen)
             setResolutionInFullscreen(res)
         else
-            Gdx.graphics.setWindowedMode(res.width, res.height)
+            graphics.setWindowedMode(res.width, res.height)
 
         resize(res.width, res.height)
     }
 
     private fun setResolutionInFullscreen(res: Resolution) {
-        if (!Gdx.graphics.supportsDisplayModeChange()) return
+        if (!graphics.supportsDisplayModeChange()) return
 
-        val currentMonitor = Gdx.graphics.monitor
-        val modes = Gdx.graphics.getDisplayModes(currentMonitor)
+        val currentMonitor = graphics.monitor
+        val modes = graphics.getDisplayModes(currentMonitor)
 
-        for (mode in modes) {
-            if (mode.width == res.width && mode.height == res.height) {
-                Gdx.graphics.setFullscreenMode(mode)
-                break
-            }
-        }
+        val mode = modes.first { it.width == res.width && it.height == res.height }
+
+        graphics.setFullscreenMode(mode)
     }
 
 }

@@ -72,10 +72,10 @@ class SettingsScreen : Scene() {
             add(Label("Resolution", theme))
             add(resolution).height(40f).row()
 
-            add(Label("FullScreen", theme))
+            add(Label("Fullscreen", theme))
             add(fullscreen).width(25f).left().row()
 
-            add(goBack).colspan(3)
+            add(goBack).colspan(3).padTop(10f)
         }
 
         wrapper.addActor(root)
