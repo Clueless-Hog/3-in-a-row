@@ -61,7 +61,7 @@ class SettingsScreen : Scene() {
             setFillParent(true)
             center()
 
-            defaults().size(40f).pad(5f)
+            defaults().size(40f).pad(5f).padRight(30f)
 
             columnDefaults(0).width(getScreenWidth() * 0.1f)
             columnDefaults(1).width(getScreenWidth() * 0.15f)
@@ -78,7 +78,7 @@ class SettingsScreen : Scene() {
             add(goBack).colspan(3).padTop(10f)
         }
 
-        wrapper.addActor(root)
+        hud.addActor(root)
     }
 
     override fun load() = true

@@ -1,9 +1,13 @@
 package org.cluelesshog.game
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.ScalingViewport
+import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxScreen
 import org.cluelesshog.game.asset.Theme
 import org.cluelesshog.game.scene.gamescreen.Settings
@@ -11,6 +15,11 @@ import org.cluelesshog.game.scene.gamescreen.Settings
 abstract class Scene (
     protected val theme : Skin = Theme.default(),
     protected val wrapper: Stage = Stage(FitViewport(
+        Settings.resolution.width.toFloat(),
+        Settings.resolution.height.toFloat()
+    )),
+    protected val hud: Stage = Stage(ScalingViewport(
+        Scaling.fit,
         Settings.resolution.width.toFloat(),
         Settings.resolution.height.toFloat()
     ))
@@ -37,7 +46,7 @@ abstract class Scene (
 
         isVisible = true
         wrapper.isDebugAll = Config.DEBUG_MODE
-        Gdx.input.inputProcessor = wrapper
+        Gdx.input.inputProcessor = InputMultiplexer(wrapper, hud)
     }
 
     override fun hide() {
@@ -51,7 +60,10 @@ abstract class Scene (
         }
 
         wrapper.act(delta)
+        hud.act(delta)
+
         wrapper.draw()
+        hud.draw()
     }
 
     final override fun resize(width: Int, height: Int) {
@@ -60,6 +72,7 @@ abstract class Scene (
         }
 
         wrapper.viewport.update(width, height, true)
+        hud.viewport.update(width, height, true)
 
         onResize(width, height)
     }
@@ -70,6 +83,7 @@ abstract class Scene (
 
     override fun dispose() {
         wrapper.dispose()
+        hud.dispose()
     }
 
     protected fun getScreenWidth() = wrapper.viewport.screenWidth

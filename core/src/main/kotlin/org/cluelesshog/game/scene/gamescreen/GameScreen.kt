@@ -42,7 +42,7 @@ class GameScreen : Scene() {
         }
 
         Scene2DSkin.defaultSkin = theme
-        val root = scene2d.table {
+        val ui = scene2d.table {
             setFillParent(true)
 
             top().pad(30f)
@@ -50,17 +50,18 @@ class GameScreen : Scene() {
             add(score).width(200f)
             row()
 
-            add(view).colspan(2).expand().center()
+        }
+        val gameField = scene2d.table {
+            setFillParent(true)
+
+            add(view).expand().center()
         }
 
-        wrapper.addActor(root)
+        wrapper.addActor(gameField)
+        hud.addActor(ui)
     }
 
     override fun load() = true
-
-    override fun dispose() {
-        wrapper.dispose()
-    }
 
     private fun resolutionObserver(settings: Settings) {
         val res = settings.resolution
