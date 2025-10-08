@@ -1,4 +1,4 @@
-package org.cluelesshog.game
+package engine
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

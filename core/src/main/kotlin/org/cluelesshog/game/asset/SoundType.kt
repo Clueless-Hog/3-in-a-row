@@ -1,4 +1,4 @@
-package org.cluelesshog.game.scene.gamescreen
+package org.cluelesshog.game.asset
 
 enum class SoundType {
     SWAP,

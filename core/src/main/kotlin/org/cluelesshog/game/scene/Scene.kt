@@ -1,4 +1,4 @@
-package org.cluelesshog.game
+package org.cluelesshog.game.scene
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
@@ -7,22 +7,26 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScalingViewport
-import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxScreen
+import org.cluelesshog.game.Config
 import org.cluelesshog.game.asset.Theme
-import org.cluelesshog.game.scene.gamescreen.Settings
+import org.cluelesshog.game.scene.settings.Settings
 
 abstract class Scene (
     protected val theme : Skin = Theme.default(),
-    protected val wrapper: Stage = Stage(FitViewport(
-        Settings.resolution.width.toFloat(),
-        Settings.resolution.height.toFloat()
-    )),
-    protected val hud: Stage = Stage(ScalingViewport(
-        Scaling.fit,
-        Settings.resolution.width.toFloat(),
-        Settings.resolution.height.toFloat()
-    ))
+    protected val wrapper: Stage = Stage(
+        FitViewport(
+            Settings.resolution.width.toFloat(),
+            Settings.resolution.height.toFloat()
+        )
+    ),
+    protected val hud: Stage = Stage(
+        ScalingViewport(
+            Scaling.fit,
+            Settings.resolution.width.toFloat(),
+            Settings.resolution.height.toFloat()
+        )
+    )
 ) : KtxScreen {
     private var isVisible = false
 

@@ -1,4 +1,4 @@
-package org.cluelesshog.game.scene.gamescreen
+package org.cluelesshog.game.scene.settings
 
 object Settings {
     var volume: Float = 1f
