@@ -1,5 +1,7 @@
 package org.cluelesshog.game.logic
 
+import engine.event.EventBus
+import org.cluelesshog.game.logic.event.JewelSwapped
 import kotlin.math.sqrt
 
 class Board : Iterable<Jewel> {
@@ -37,14 +39,15 @@ class Board : Iterable<Jewel> {
 
     fun getScore() = scoreSystem.score
 
-    fun swap(firstPos: JewelPos, secondPos: JewelPos): List<Match> {
-        val result = mutableListOf<Match>()
+    fun swap(firstPos: JewelPos, secondPos: JewelPos): Boolean {
         val first = getJewel(firstPos)
         val second = getJewel(secondPos)
 
         if (!checkMatch(first, second)) {
-            return emptyList()
+            return false
         }
+
+        EventBus.post(JewelSwapped(firstPos, secondPos))
 
         val temp = first.copy()
         first.pos = second.pos
@@ -66,18 +69,19 @@ class Board : Iterable<Jewel> {
                 refreshed = true
             }
 
-            result += Match(
-                matches,
-                movedJewels,
-                newJewels,
-                getScore(),
-                refreshed
+            EventBus.post(
+                Match(
+                    matches,
+                    movedJewels,
+                    newJewels,
+                    getScore(),
+                    refreshed
+                )
             )
-
             matches = MatchDetect.detect(this)
         }
 
-        return result
+        return true
     }
 
     fun hasPossibleMoves(): Boolean {
