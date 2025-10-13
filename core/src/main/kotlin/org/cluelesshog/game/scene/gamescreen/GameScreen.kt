@@ -8,10 +8,14 @@ import ktx.actors.onClick
 import ktx.scene2d.Scene2DSkin
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
-import org.cluelesshog.game.Scene
-import org.cluelesshog.game.SceneController
+import org.cluelesshog.game.scene.Scene
+import engine.SceneController
 import org.cluelesshog.game.asset.SoundManager
+import org.cluelesshog.game.asset.SoundType
 import org.cluelesshog.game.logic.Board
+import org.cluelesshog.game.scene.settings.Resolution
+import org.cluelesshog.game.scene.settings.Settings
+import org.cluelesshog.game.scene.settings.SettingsScreen
 
 class GameScreen : Scene() {
     private var model: Board

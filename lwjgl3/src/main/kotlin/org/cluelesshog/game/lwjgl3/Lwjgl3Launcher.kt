@@ -5,7 +5,7 @@ package org.cluelesshog.game.lwjgl3
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import org.cluelesshog.game.Launcher
-import org.cluelesshog.game.scene.gamescreen.Settings
+import org.cluelesshog.game.scene.settings.Settings
 
 /** Launches the desktop (LWJGL3) application. */
 fun main() {

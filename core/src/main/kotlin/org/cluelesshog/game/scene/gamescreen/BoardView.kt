@@ -4,13 +4,18 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import engine.Pipe
 import engine.ThresholdTrigger
+import engine.event.EventBus
 import ktx.actors.onClick
 import org.cluelesshog.game.asset.SoundManager
+import org.cluelesshog.game.asset.SoundType
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
 import org.cluelesshog.game.logic.Match
+import org.cluelesshog.game.logic.event.JewelSwapped
+import kotlin.to
 
 class BoardView(
     private val board: Board,
@@ -24,6 +29,8 @@ class BoardView(
     private val boardTop = board.rowsCount * jewelSize
     private var currentCombo = 1f
 
+    private var pipe = Pipe()
+
     init {
         disableInput()
         for (jewel in board) {
@@ -32,7 +39,29 @@ class BoardView(
             actors[jewel.pos] = actor
         }
 
-        // Анимация падения камней, во время которой заблокирован ввод
+        initAnimation()
+
+        EventBus.subscribe<JewelSwapped> {
+            currentCombo = 1f
+
+            val first = actors[it.from]!!
+            val second = actors[it.to]!!
+
+            onSwap(first, second)
+        }
+
+        EventBus.subscribe<Match> {
+            pipe.blocking {
+                onMatch(it, pipe::unlock)
+            }
+        }
+
+        setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
+
+        pipe.run()
+    }
+
+    private fun initAnimation() {
         val initTrigger = ThresholdTrigger(board.count()) {
             enableInput()
         }
@@ -50,7 +79,104 @@ class BoardView(
                 )
             )
         }
-        setSize(board.columnsCount * jewelSize, board.rowsCount * jewelSize)
+    }
+
+    private fun getJewelImage(jewel: Jewel): JewelActor {
+        val actor = JewelActor(jewel, jewelSize)
+
+        actor.onClick(::clickOnJewel)
+
+        return actor
+    }
+
+    private fun clickOnJewel(actor: JewelActor) {
+        if (previous == null) {
+            actor.highlight()
+            previous = actor
+
+            return
+        }
+
+        val from = previous!!
+        from.unhighlight()
+
+        if (!board.swap(from.pos, actor.pos)) {
+            actor.highlight()
+            previous = actor
+        }
+    }
+
+    private fun onSwap(first: JewelActor, second: JewelActor) {
+        pipe.blocking {
+            previous = null
+
+            val temp = first.pos
+            first.pos = second.pos
+            second.pos = temp
+
+            actors[first.pos] = first
+            actors[second.pos] = second
+
+            val firstPos = first.x to first.y
+            val secondPos = second.x to second.y
+
+            disableInput()
+
+            SoundManager.playSound(SoundType.SWAP)
+
+            // Анимация свапа
+            first.addAction(
+                Actions.moveTo(
+                    secondPos.first,
+                    secondPos.second,
+                    0.3f,
+                    Interpolation.exp10Out
+                )
+            )
+
+            second.addAction(
+                Actions.sequence(
+                    Actions.moveTo(firstPos.first, firstPos.second, 0.3f, Interpolation.exp10Out),
+                    Actions.run {
+                        pipe.unlock()
+                    }
+                )
+            )
+        }
+    }
+
+    private fun onMatch(match: Match, onComplete: () -> Unit) {
+        disableInput()
+        val completionTrigger = ThresholdTrigger(match.matches.size) {
+            onJewelsDestroyed(match) {
+                enableInput()
+                onComplete()
+            }
+        }
+        currentCombo += 0.3f
+        // Удаление всех совпавших камней
+        SoundManager.playSound(SoundType.MATCH, pitch = currentCombo)
+        match.matches.forEach { pos ->
+            val actor = actors[pos]!!
+            actors.remove(pos)
+            actor.addAction(
+                Actions.sequence(
+                    Actions.scaleBy(.1f, .1f, .1f),
+                    Actions.scaleBy(-1f, -1f, .2f),
+                    Actions.fadeOut(.1f),
+                    Actions.run {
+                        completionTrigger.attempt()
+                        actor.remove()
+                    },
+                ),
+            )
+        }
+    }
+
+    private fun onJewelsDestroyed(match: Match, onComplete: () -> Unit) {
+        scoreView.update(match.scoreUp)
+
+        applyGravity(match, onComplete)
     }
 
     private fun applyGravity(match: Match, onComplete: () -> Unit) {
@@ -139,114 +265,6 @@ class BoardView(
                 )
             )
         }
-    }
-
-    private fun getJewelImage(jewel: Jewel): JewelActor {
-        val actor = JewelActor(jewel, jewelSize)
-
-        actor.onClick { clickOnJewel(this) }
-
-        return actor
-    }
-
-    private fun clickOnJewel(second: JewelActor) {
-        if (previous == null) {
-            second.highlight()
-            previous = second
-
-            return
-        }
-
-        val first = previous!!
-        first.unhighlight()
-        val result = ArrayDeque(board.swap(first.pos, second.pos))
-        if (result.isEmpty()) {
-            second.highlight()
-            previous = second
-
-            return
-        }
-
-        previous = null
-
-        val temp = first.pos
-        first.pos = second.pos
-        second.pos = temp
-
-        actors[first.pos] = first
-        actors[second.pos] = second
-
-        val firstPos = first.x to first.y
-        val secondPos = second.x to second.y
-
-        disableInput()
-
-        SoundManager.playSound(SoundType.SWAP)
-
-        // Анимация свапа
-        first.addAction(
-            Actions.moveTo(
-                secondPos.first,
-                secondPos.second,
-                0.3f,
-                Interpolation.exp10Out
-            )
-        )
-
-        second.addAction(
-            Actions.sequence(
-                Actions.moveTo(firstPos.first, firstPos.second, 0.3f, Interpolation.exp10Out),
-                Actions.run {
-                    enableInput()
-                    handleMatches(result)
-                }
-            )
-        )
-    }
-
-    private fun handleMatches(matches: ArrayDeque<Match>) {
-        val match = matches.removeFirstOrNull()
-        if (match == null) {
-            currentCombo = 1f
-            return
-        }
-
-        disableInput()
-
-        onMatch(match) {
-            enableInput()
-            handleMatches(matches)
-        }
-    }
-
-    private fun onMatch(match: Match, onComplete: () -> Unit) {
-        val completionTrigger = ThresholdTrigger(match.matches.size) {
-            onJewelsDestroyed(match, onComplete)
-        }
-        currentCombo += 0.3f
-        // Удаление всех совпавших камней
-        SoundManager.playSound(SoundType.MATCH, pitch = currentCombo)
-        match.matches.forEach { pos ->
-            val actor = actors[pos]!!
-            actors.remove(pos)
-            actor.addAction(
-                Actions.sequence(
-                    Actions.scaleBy(.1f, .1f, .1f),
-                    Actions.scaleBy(-1f, -1f, .2f),
-                    Actions.fadeOut(.1f),
-                    Actions.run {
-                        completionTrigger.attempt()
-                        actor.remove()
-                    },
-                ),
-            )
-        }
-    }
-
-    private fun onJewelsDestroyed(match: Match, onComplete: () -> Unit) {
-        scoreView.update(match.scoreUp)
-
-        applyGravity(match, onComplete)
     }
 
     private fun disableInput() {

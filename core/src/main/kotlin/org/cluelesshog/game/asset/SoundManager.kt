@@ -2,8 +2,7 @@ package org.cluelesshog.game.asset
 
 import asset.AssetLoader
 import com.badlogic.gdx.audio.Sound
-import org.cluelesshog.game.scene.gamescreen.Settings
-import org.cluelesshog.game.scene.gamescreen.SoundType
+import org.cluelesshog.game.scene.settings.Settings
 
 object SoundManager {
     private val cache = mutableMapOf<SoundType, Sound>()

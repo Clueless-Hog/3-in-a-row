@@ -1,9 +1,11 @@
 package org.cluelesshog.game.logic
 
+import engine.event.EventBus
 import org.cluelesshog.game.logic.JewelType.DIAMOND
 import org.cluelesshog.game.logic.JewelType.EMERALD
 import org.cluelesshog.game.logic.JewelType.RUBY
 import org.cluelesshog.game.logic.JewelType.AMETHYST
+import org.cluelesshog.game.logic.event.JewelSwapped
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -15,10 +17,15 @@ import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BoardTest {
     private lateinit var board: Board
+    private var isSwapped = false
 
     @BeforeEach
     fun setup() {
         RNG.setSeed(123)
+
+        EventBus.subscribe<JewelSwapped> {
+            isSwapped = true
+        }
 
         board = squareBoardOf(
             "ERD",
@@ -29,24 +36,27 @@ class BoardTest {
 
     @Test
     fun testSwapHappens() {
-        var result = board.swap(JewelPos(2, 1), JewelPos(2, 0))
-        assertTrue(result.isNotEmpty())
+        val firstSwap = EventBus.subscribe<Match> {
+            assertMatches(
+                listOf(
+                    JewelPos(0, 0),
+                    JewelPos(1, 0),
+                    JewelPos(2, 0)
+                ), it
+            )
+            assertJewelsFellDown(it)
+            assertNewJewels(
+                listOf(
+                    Jewel(JewelPos(0, 2), DIAMOND),
+                    Jewel(JewelPos(1, 2), EMERALD),
+                    Jewel(JewelPos(2, 2), AMETHYST)
+                ), it
+            )
+            assertEquals(30, it.scoreUp)
+        }
 
-        assertMatches(
-            listOf(
-                JewelPos(0, 0),
-                JewelPos(1, 0),
-                JewelPos(2, 0)
-            ), result[0]
-        )
-        assertJewelsFellDown(result[0])
-        assertNewJewels(
-            listOf(
-                Jewel(JewelPos(0, 2), DIAMOND),
-                Jewel(JewelPos(1, 2), EMERALD),
-                Jewel(JewelPos(2, 2), AMETHYST)
-            ), result[0]
-        )
+        board.swap(JewelPos(2, 1), JewelPos(2, 0))
+        assertTrue(isSwapped)
 
         assertEqualsBoardOf(
             arrayOf(
@@ -55,25 +65,30 @@ class BoardTest {
                 "RDR"
             ), board
         )
-        assertEquals(30, result[0].scoreUp)
+        EventBus.unsubscribe(firstSwap)
 
-        result = board.swap(JewelPos(1, 1), JewelPos(1, 0))
+        isSwapped = false
+        val secondSwap = EventBus.subscribe<Match>{
+            assertMatches(
+                listOf(
+                    JewelPos(0, 0),
+                    JewelPos(1, 0),
+                    JewelPos(2, 0)
+                ), it
+            )
+            assertJewelsFellDown(it)
+            assertNewJewels(
+                listOf(
+                    Jewel(JewelPos(0, 2), EMERALD),
+                    Jewel(JewelPos(1, 2), DIAMOND),
+                    Jewel(JewelPos(2, 2), EMERALD)
+                ), it
+            )
+            assertEquals(90, it.scoreUp)
+        }
 
-        assertMatches(
-            listOf(
-                JewelPos(0, 0),
-                JewelPos(1, 0),
-                JewelPos(2, 0)
-            ), result[0]
-        )
-        assertJewelsFellDown(result[0])
-        assertNewJewels(
-            listOf(
-                Jewel(JewelPos(0, 2), EMERALD),
-                Jewel(JewelPos(1, 2), DIAMOND),
-                Jewel(JewelPos(2, 2), EMERALD)
-            ), result[0]
-        )
+        board.swap(JewelPos(1, 1), JewelPos(1, 0))
+        assertTrue(isSwapped)
 
         assertEqualsBoardOf(
             arrayOf(
@@ -82,7 +97,7 @@ class BoardTest {
                 "EDD"
             ), board
         )
-        assertEquals(90, result[0].scoreUp)
+        EventBus.unsubscribe(secondSwap)
     }
 
     private fun assertNewJewels(
@@ -135,7 +150,10 @@ class BoardTest {
     private fun checkInvalidSwap(first: JewelPos, second: JewelPos) {
         val previousBoard = board.map { it.copy() }
 
-        assertFalse(board.swap(first, second).isNotEmpty())
+        isSwapped = false
+
+        board.swap(first, second)
+        assertFalse(isSwapped)
 
         val currentBoard = board.map { it.copy() }
         kotlin.test.assertEquals(previousBoard, currentBoard)

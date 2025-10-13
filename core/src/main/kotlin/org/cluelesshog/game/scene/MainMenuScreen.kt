@@ -1,11 +1,12 @@
-package org.cluelesshog.game
+package org.cluelesshog.game.scene
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import ktx.actors.onClick
+import engine.SceneController
 import org.cluelesshog.game.asset.SoundManager
 import org.cluelesshog.game.scene.gamescreen.GameScreen
-import org.cluelesshog.game.scene.gamescreen.SoundType
+import org.cluelesshog.game.asset.SoundType
 
 class MainMenuScreen : Scene() {
     init {
