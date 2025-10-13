@@ -42,6 +42,8 @@ class BoardView(
         initAnimation()
 
         EventBus.subscribe<JewelSwapped> {
+            currentCombo = 1f
+
             val first = actors[it.from]!!
             val second = actors[it.to]!!
 
