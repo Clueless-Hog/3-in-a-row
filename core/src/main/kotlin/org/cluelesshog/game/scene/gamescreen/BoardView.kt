@@ -13,7 +13,7 @@ import org.cluelesshog.game.asset.SoundType
 import org.cluelesshog.game.logic.Board
 import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
-import org.cluelesshog.game.logic.Match
+import org.cluelesshog.game.logic.event.Match
 import org.cluelesshog.game.logic.event.JewelSwapped
 import kotlin.to
 

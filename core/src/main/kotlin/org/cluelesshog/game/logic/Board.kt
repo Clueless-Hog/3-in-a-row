@@ -2,6 +2,7 @@ package org.cluelesshog.game.logic
 
 import engine.event.EventBus
 import org.cluelesshog.game.logic.event.JewelSwapped
+import org.cluelesshog.game.logic.event.Match
 import kotlin.math.sqrt
 
 class Board : Iterable<Jewel> {

@@ -6,6 +6,7 @@ import org.cluelesshog.game.logic.JewelType.EMERALD
 import org.cluelesshog.game.logic.JewelType.RUBY
 import org.cluelesshog.game.logic.JewelType.AMETHYST
 import org.cluelesshog.game.logic.event.JewelSwapped
+import org.cluelesshog.game.logic.event.Match
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
