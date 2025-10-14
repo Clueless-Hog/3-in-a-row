@@ -19,6 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip
+import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager
 import com.badlogic.gdx.scenes.scene2d.ui.Window
 
 object Theme {
@@ -48,6 +50,7 @@ object Theme {
         createLists(skin, font)
         createScrollPanes(skin)
         createSelectBoxes(skin, font)
+        createTooltip(skin, whiteDrawable)
 
         cachedSkin = skin
         return skin
@@ -202,5 +205,15 @@ object Theme {
             backgroundOpen = skin.newDrawable("white", Color.GRAY)
             backgroundOver = skin.newDrawable("white", Color(0.3f, 0.3f, 0.3f, 1f))
         })
+    }
+
+    private fun createTooltip(skin: Skin, background: Drawable) {
+        val tooltipGenericBehavior = TooltipManager.getInstance()
+        tooltipGenericBehavior.instant() // Tooltip appears instantly on hover
+        tooltipGenericBehavior.initialTime = 0f
+        tooltipGenericBehavior.subsequentTime = 0f
+        tooltipGenericBehavior.resetTime = 0f
+        skin.add("default", tooltipGenericBehavior)
+        skin.add("default", TextTooltip.TextTooltipStyle(skin.get(Label.LabelStyle::class.java), background))
     }
 }

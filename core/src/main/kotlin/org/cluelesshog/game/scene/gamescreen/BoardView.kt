@@ -161,7 +161,7 @@ class BoardView(
         currentCombo += 0.3f
         // Удаление всех совпавших камней
         SoundManager.playSound(SoundType.MATCH, pitch = currentCombo)
-        match.matches.forEach { pos ->
+        match.matches.forEach { (pos) ->
             val actor = actors[pos]!!
             actors.remove(pos)
             actor.addAction(

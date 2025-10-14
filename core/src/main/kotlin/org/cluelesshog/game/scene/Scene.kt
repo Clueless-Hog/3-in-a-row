@@ -28,6 +28,10 @@ abstract class Scene (
         )
     )
 ) : KtxScreen {
+    companion object {
+        var exceptionHandler: (e: Throwable)-> Unit =  { throw it }
+    }
+
     private var isVisible = false
 
     private var isLoaded = false
@@ -64,11 +68,16 @@ abstract class Scene (
             return
         }
 
-        wrapper.act(delta)
-        hud.act(delta)
+        try {
+            // TODO wrapper подразумевает hud тоже. Нужно переделать так, чтобы здесь остался только wrapper
+            wrapper.act(delta)
+            hud.act(delta)
 
-        wrapper.draw()
-        hud.draw()
+            wrapper.draw()
+            hud.draw()
+        } catch (e: Throwable) {
+            exceptionHandler(e)
+        }
     }
 
     final override fun resize(width: Int, height: Int) {

@@ -131,10 +131,10 @@ class Board : Iterable<Jewel> {
         }
     }
 
-    private fun destroyJewels(positions: List<JewelPos>) {
-        for (pos in positions) {
-            scoreSystem.upScore(getJewelOrNull(pos)?.type)
-            grid.remove(pos)
+    private fun destroyJewels(jewels: List<Jewel>) {
+        for (jewel in jewels) {
+            scoreSystem.upScore(jewel.type)
+            grid.remove(jewel.pos)
         }
     }
 

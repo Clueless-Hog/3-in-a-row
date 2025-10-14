@@ -19,3 +19,11 @@ object EventBus {
         listeners[event::class.java]?.forEach { it(event) }
     }
 }
+
+fun signal(event: Any) {
+    EventBus.post(event)
+}
+
+inline fun <reified T : Any> listen(noinline listener: (T) -> Unit) {
+    EventBus.subscribe<T>(listener)
+}

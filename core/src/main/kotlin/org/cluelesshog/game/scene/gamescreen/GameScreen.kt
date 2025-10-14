@@ -11,9 +11,13 @@ import ktx.scene2d.table
 import org.cluelesshog.game.scene.Scene
 import engine.SceneController
 import org.cluelesshog.game.ai.SwapBot
+import engine.event.EventBus
 import org.cluelesshog.game.asset.SoundManager
 import org.cluelesshog.game.asset.SoundType
 import org.cluelesshog.game.logic.Board
+import org.cluelesshog.game.craft.view.CraftScene
+import org.cluelesshog.game.inventory.event.StoreMinedOre
+import org.cluelesshog.game.logic.event.Match
 import org.cluelesshog.game.scene.settings.Resolution
 import org.cluelesshog.game.scene.settings.Settings
 import org.cluelesshog.game.scene.settings.SettingsScreen
@@ -42,10 +46,21 @@ class GameScreen : Scene() {
 
         swapBot = SwapBot(model) { !view.isLocked() }
 
+        // TODO принадлежит другому модулю. Продумать правильную систему инициализации и приостановки
+        EventBus.subscribe<Match> {
+            val handler = StoreMinedOre()
+            handler(it)
+        }
+
         settings = TextButton("Settings", theme)
         settings.onClick {
             SoundManager.playSound(SoundType.CLICK)
             SceneController.set<SettingsScreen>()
+        }
+
+        val craftScreen = TextButton("Craft", theme)
+        craftScreen.onClick {
+            SceneController.set<CraftScene>()
         }
 
         Scene2DSkin.defaultSkin = theme
@@ -56,6 +71,8 @@ class GameScreen : Scene() {
             add(settings).width(200f).height(50f).left().expandX()
             add(swapBot).width(100f).height(100f).left()
             add(score).width(200f)
+            row()
+            add(craftScreen).width(200f).height(50f).left().expandX().padTop(1f)
             row()
 
         }
