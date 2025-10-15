@@ -50,6 +50,7 @@ abstract class Scene (
 
         isVisible = true
         wrapper.isDebugAll = Config.DEBUG_MODE
+        hud .isDebugAll = Config.DEBUG_MODE
         Gdx.input.inputProcessor = InputMultiplexer(wrapper, hud)
     }
 
