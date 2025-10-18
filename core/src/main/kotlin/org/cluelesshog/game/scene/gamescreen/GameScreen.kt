@@ -10,6 +10,7 @@ import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import org.cluelesshog.game.scene.Scene
 import engine.SceneController
+import org.cluelesshog.game.ai.SwapBot
 import org.cluelesshog.game.asset.SoundManager
 import org.cluelesshog.game.asset.SoundType
 import org.cluelesshog.game.logic.Board
@@ -21,13 +22,13 @@ class GameScreen : Scene() {
     private var model: Board
     private var view: BoardView
     private var score: ScoreView
+    private var swapBot: SwapBot
     private var settings: Button
 
     private val rows = 8
     private val columns = 8
 
-    private val boardSize: Float
-        get() = minOf(getScreenWidth() * 0.8f, getScreenHeight() * 0.8f)
+    fun getBoardSize() = minOf(getScreenWidth() * 0.8f, getScreenHeight() * 0.8f)
 
     init {
         Settings.addObserver(::resolutionObserver)
@@ -37,7 +38,9 @@ class GameScreen : Scene() {
         score = ScoreView()
         score.setAlignment(Align.center)
 
-        view = BoardView(model, score, boardSize, boardSize)
+        view = BoardView(model, score, getBoardSize(), getBoardSize())
+
+        swapBot = SwapBot(model) { !view.isLocked() }
 
         settings = TextButton("Settings", theme)
         settings.onClick {
@@ -51,6 +54,7 @@ class GameScreen : Scene() {
 
             top().pad(30f)
             add(settings).width(200f).height(50f).left().expandX()
+            add(swapBot).width(100f).height(100f).left()
             add(score).width(200f)
             row()
 

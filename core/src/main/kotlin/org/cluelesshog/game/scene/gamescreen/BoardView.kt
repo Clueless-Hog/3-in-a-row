@@ -15,6 +15,7 @@ import org.cluelesshog.game.logic.Jewel
 import org.cluelesshog.game.logic.JewelPos
 import org.cluelesshog.game.logic.event.Match
 import org.cluelesshog.game.logic.event.JewelSwapped
+import org.cluelesshog.game.scene.gamescreen.event.JewelClicked
 import kotlin.to
 
 class BoardView(
@@ -61,6 +62,8 @@ class BoardView(
         pipe.run()
     }
 
+    fun isLocked() = pipe.isLocked
+
     private fun initAnimation() {
         val initTrigger = ThresholdTrigger(board.count()) {
             enableInput()
@@ -90,6 +93,8 @@ class BoardView(
     }
 
     private fun clickOnJewel(actor: JewelActor) {
+        EventBus.post(JewelClicked())
+
         if (previous == null) {
             actor.highlight()
             previous = actor

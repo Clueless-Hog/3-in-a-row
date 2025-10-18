@@ -94,6 +94,28 @@ class Board : Iterable<Jewel> {
         return false
     }
 
+    fun getPossibleMoves(): List<Pair<JewelPos, JewelPos>> {
+        val possibleMoves = mutableListOf<Pair<JewelPos, JewelPos>>()
+        val visited = mutableSetOf<Pair<JewelPos, JewelPos>>()
+
+        for (jewel in this) {
+            for (neighbor in getNeighbors(jewel)) {
+                // Чтобы не проверять (A,B) и потом (B,A)
+                val pair = listOf(jewel.pos, neighbor.pos).sortedBy { it.hashCode() }
+                val key = pair[0] to pair[1]
+                if (key in visited) continue
+                visited += key
+
+                if (checkMatch(jewel, neighbor)) {
+                    possibleMoves += (jewel.pos to neighbor.pos)
+                }
+            }
+        }
+
+        return possibleMoves
+    }
+
+
     private fun getNeighbors(jewel: Jewel): List<Jewel> {
         val (col, row) = jewel.pos
 

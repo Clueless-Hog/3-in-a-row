@@ -5,7 +5,8 @@ import kotlinx.coroutines.yield
 import ktx.async.KtxAsync
 
 class Pipe {
-    private var isLocked = false
+    var isLocked = false
+        private set
     private var isRunning = false
     private val actions = ArrayDeque<() -> Unit>()
 
