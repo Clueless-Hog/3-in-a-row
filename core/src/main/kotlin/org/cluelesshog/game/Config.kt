@@ -9,4 +9,6 @@ object Config {
     }
 
     val DEBUG_MODE: Boolean = env.get("DEBUG_MODE")?.toBoolean() ?: false
+
+    val GAME_SEED = env.get("GAME_SEED")?.toLong() ?: System.currentTimeMillis()
 }

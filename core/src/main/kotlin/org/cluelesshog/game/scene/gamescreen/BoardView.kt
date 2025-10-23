@@ -16,6 +16,7 @@ import org.cluelesshog.game.logic.JewelPos
 import org.cluelesshog.game.logic.event.Match
 import org.cluelesshog.game.logic.event.JewelSwapped
 import org.cluelesshog.game.scene.gamescreen.event.JewelClicked
+import kotlin.math.max
 import kotlin.to
 
 class BoardView(
@@ -28,7 +29,9 @@ class BoardView(
     private val actors = mutableMapOf<JewelPos, JewelActor>()
     private var previous: JewelActor? = null
     private val boardTop = board.rowsCount * jewelSize
-    private var currentCombo = 1f
+    private var currentCombo = 1
+    private val animationSpeed
+        get() = max(0.1f, 1 - (currentCombo.toFloat()/10))
 
     private var pipe = Pipe()
 
@@ -43,7 +46,7 @@ class BoardView(
         initAnimation()
 
         EventBus.subscribe<JewelSwapped> {
-            currentCombo = 1f
+            currentCombo = 1
 
             val first = actors[it.from]!!
             val second = actors[it.to]!!
@@ -158,9 +161,9 @@ class BoardView(
                 onComplete()
             }
         }
-        currentCombo += 0.3f
+        currentCombo++
         // Удаление всех совпавших камней
-        SoundManager.playSound(SoundType.MATCH, pitch = currentCombo)
+        SoundManager.playSound(SoundType.MATCH, pitch = currentCombo/3f)
         match.matches.forEach { (pos) ->
             val actor = actors[pos]!!
             actors.remove(pos)
@@ -206,7 +209,7 @@ class BoardView(
 
             actor.addAction(
                 Actions.sequence(
-                    Actions.moveBy(0f, -(step * jewelSize), .7f, Interpolation.exp10Out),
+                    Actions.moveBy(0f, -(step * jewelSize), animationSpeed, Interpolation.exp10Out),
                     Actions.run {
                         afterGravityTrigger.attempt()
                     }
@@ -226,7 +229,7 @@ class BoardView(
             addActor(newActor)
             newActor.addAction(
                 Actions.sequence(
-                    Actions.moveTo(toX, toY, .7f, Interpolation.exp10Out),
+                    Actions.moveTo(toX, toY, animationSpeed, Interpolation.exp10Out),
                     Actions.run {
                         afterGravityTrigger.attempt()
                     }
