@@ -3,7 +3,6 @@ package org.cluelesshog.game.asset
 import asset.AssetLoader.getTile
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import org.cluelesshog.game.ai.SwapBotState
 import org.cluelesshog.game.logic.JewelType
 
 object TextureUtils {
@@ -19,13 +18,5 @@ object TextureUtils {
             }
             TextureRegionDrawable(TextureRegion(texture))
         }
-    }
-
-    fun loadTextureForHelperState(state: SwapBotState): TextureRegionDrawable {
-        val texture = when (state) {
-            SwapBotState.ACTIVE -> getTile("kek")
-            SwapBotState.SLEEP -> getTile("zzz")
-        }
-        return TextureRegionDrawable(TextureRegion(texture))
     }
 }
