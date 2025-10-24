@@ -1,4 +1,4 @@
-package org.cluelesshog.game.logic
+package org.cluelesshog.game.match3.logic
 
 class ScoreSystem(score: Int = 0) {
     var score: Int = score

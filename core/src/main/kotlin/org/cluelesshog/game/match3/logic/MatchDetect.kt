@@ -1,4 +1,4 @@
-package org.cluelesshog.game.logic
+package org.cluelesshog.game.match3.logic
 
 internal object MatchDetect {
     fun detect(board: Board): List<Jewel> {

@@ -24,6 +24,10 @@ fun signal(event: Any) {
     EventBus.post(event)
 }
 
-inline fun <reified T : Any> listen(noinline listener: (T) -> Unit) {
-    EventBus.subscribe<T>(listener)
+fun stopListening(process: EventBus.Subscription) {
+    EventBus.unsubscribe(process)
+}
+
+inline fun <reified T : Any> listen(noinline listener: (T) -> Unit): EventBus.Subscription {
+    return EventBus.subscribe<T>(listener)
 }

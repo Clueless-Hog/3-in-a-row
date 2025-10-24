@@ -2,7 +2,7 @@ package org.cluelesshog.game.inventory.event
 
 import org.cluelesshog.game.inventory.Inventory
 import org.cluelesshog.game.inventory.Item
-import org.cluelesshog.game.logic.Match
+import org.cluelesshog.game.match3.logic.event.Match
 
 class StoreMinedOre {
     operator fun invoke(event: Match) {

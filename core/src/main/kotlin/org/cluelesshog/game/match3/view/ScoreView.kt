@@ -1,4 +1,4 @@
-package org.cluelesshog.game.scene.gamescreen
+package org.cluelesshog.game.match3.view
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import org.cluelesshog.game.asset.Theme

@@ -1,6 +1,6 @@
-package org.cluelesshog.game.logic
+package org.cluelesshog.game.match3.logic
 
-import org.cluelesshog.game.Config
+import engine.Config
 import kotlin.enums.enumEntries
 import kotlin.random.Random
 

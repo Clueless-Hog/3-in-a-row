@@ -6,12 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import engine.SceneController
 import ktx.actors.onClick
 import org.cluelesshog.game.inventory.view.InventoryView
-import org.cluelesshog.game.scene.Scene
+import engine.Scene
 import org.cluelesshog.game.inventory.Inventory
 import org.cluelesshog.game.inventory.ItemRef
-import org.cluelesshog.game.scene.gamescreen.GameScreen
-
-
+import org.cluelesshog.game.match3.view.GameScreen
 
 class CraftScene: Scene() {
     private val boardSize: Float

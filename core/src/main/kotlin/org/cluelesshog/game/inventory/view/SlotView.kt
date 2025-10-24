@@ -6,12 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.badlogic.gdx.utils.Align
 import ktx.scene2d.textTooltip
 import org.cluelesshog.game.asset.TextureUtils
 import org.cluelesshog.game.inventory.InventorySlot
 import org.cluelesshog.game.inventory.Item
-import org.cluelesshog.game.logic.JewelType
 
 class SlotView(val slot: InventorySlot): Group() {
     private val tooltip: TextTooltip = textTooltip("")
@@ -35,7 +33,6 @@ class SlotView(val slot: InventorySlot): Group() {
         private fun loadItemTexture(item: Item?): TextureRegionDrawable? {
             return when {
                 item == null -> null
-                JewelType.hasValue(item.name) -> TextureUtils.loadTextureForJewelType(JewelType.valueOf(item.name))
                 else -> TextureUtils.loadTexture(item.name.lowercase())
             }
         }

@@ -1,4 +1,4 @@
-package org.cluelesshog.game.scene
+package engine
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
@@ -8,9 +8,9 @@ import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScalingViewport
 import ktx.app.KtxScreen
-import org.cluelesshog.game.Config
+import engine.Config
 import org.cluelesshog.game.asset.Theme
-import org.cluelesshog.game.scene.settings.Settings
+import org.cluelesshog.game.settings.Settings
 
 abstract class Scene (
     protected val theme : Skin = Theme.default(),

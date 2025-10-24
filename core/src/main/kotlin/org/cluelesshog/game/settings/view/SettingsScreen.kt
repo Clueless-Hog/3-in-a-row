@@ -1,4 +1,4 @@
-package org.cluelesshog.game.scene.settings
+package org.cluelesshog.game.settings.view
 
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -12,9 +12,11 @@ import ktx.actors.onChange
 import ktx.actors.onChangeEvent
 import ktx.actors.onClick
 import org.cluelesshog.game.asset.SoundManager
-import org.cluelesshog.game.scene.Scene
-import org.cluelesshog.game.scene.gamescreen.GameScreen
 import org.cluelesshog.game.asset.SoundType
+import engine.Scene
+import org.cluelesshog.game.match3.view.GameScreen
+import org.cluelesshog.game.settings.Resolution
+import org.cluelesshog.game.settings.Settings
 
 class SettingsScreen : Scene() {
     init {

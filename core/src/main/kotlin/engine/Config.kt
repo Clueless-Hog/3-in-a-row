@@ -1,4 +1,4 @@
-package org.cluelesshog.game
+package engine
 
 import io.github.cdimascio.dotenv.dotenv
 

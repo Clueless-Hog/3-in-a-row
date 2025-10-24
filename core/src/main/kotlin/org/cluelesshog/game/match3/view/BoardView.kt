@@ -1,4 +1,4 @@
-package org.cluelesshog.game.scene.gamescreen
+package org.cluelesshog.game.match3.view
 
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Group
@@ -6,16 +6,18 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import engine.Pipe
 import engine.ThresholdTrigger
-import engine.event.EventBus
+import engine.event.listen
+import engine.event.signal
 import ktx.actors.onClick
 import org.cluelesshog.game.asset.SoundManager
 import org.cluelesshog.game.asset.SoundType
-import org.cluelesshog.game.logic.Board
-import org.cluelesshog.game.logic.Jewel
-import org.cluelesshog.game.logic.JewelPos
-import org.cluelesshog.game.logic.event.Match
-import org.cluelesshog.game.logic.event.JewelSwapped
-import org.cluelesshog.game.scene.gamescreen.event.JewelClicked
+import org.cluelesshog.game.match3.logic.Board
+import org.cluelesshog.game.match3.logic.Jewel
+import org.cluelesshog.game.match3.logic.JewelPos
+import org.cluelesshog.game.match3.logic.event.Match
+import org.cluelesshog.game.match3.logic.event.JewelSwapped
+import org.cluelesshog.game.match3.logic.event.JewelClicked
+import kotlin.collections.iterator
 import kotlin.math.max
 import kotlin.to
 
@@ -45,7 +47,7 @@ class BoardView(
 
         initAnimation()
 
-        EventBus.subscribe<JewelSwapped> {
+        listen<JewelSwapped> {
             currentCombo = 1
 
             val first = actors[it.from]!!
@@ -54,7 +56,7 @@ class BoardView(
             onSwap(first, second)
         }
 
-        EventBus.subscribe<Match> {
+        listen<Match> {
             pipe.blocking {
                 onMatch(it, pipe::unlock)
             }
@@ -96,7 +98,7 @@ class BoardView(
     }
 
     private fun clickOnJewel(actor: JewelActor) {
-        EventBus.post(JewelClicked())
+        signal(JewelClicked())
 
         if (previous == null) {
             actor.highlight()

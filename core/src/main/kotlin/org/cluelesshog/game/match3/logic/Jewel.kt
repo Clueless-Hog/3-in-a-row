@@ -1,4 +1,4 @@
-package org.cluelesshog.game.logic
+package org.cluelesshog.game.match3.logic
 
 import kotlin.math.abs
 

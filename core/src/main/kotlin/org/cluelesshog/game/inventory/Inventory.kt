@@ -69,12 +69,12 @@ object Inventory: Iterable<InventorySlot> {
 
     fun getFreeSlot(): InventorySlot {
         synchronized(lock) {
-        val freeSlot = slots.firstOrNull { it.isEmpty() }
-        if (freeSlot !== null) {
-            return freeSlot
-        }
+            val freeSlot = slots.firstOrNull { it.isEmpty() }
+            if (freeSlot !== null) {
+                return freeSlot
+            }
 
-            val cell = max( size(), 1)
+            val cell = max(size(), 1)
             slots.add(InventorySlot.newEmpty(cell))
 
             return get(cell)
@@ -103,9 +103,13 @@ private object PersistentStorage {
         val persistedInventorySize = storage.getOrNull<Int>("inventory.size") ?: 0
         for (cell in 1..persistedInventorySize) {
             val key = cellKey(cell)
-            storage.getOrNull<String>("$key.name")?.let {
+            val itemName = storage.getOrNull<String>("$key.name")
+            if (itemName !== null) {
                 val itemQuantity = storage.getOrNull<Int>("$key.quantity")!!
-                inventory.store(cell, Item(it), itemQuantity)
+                inventory.store(cell, Item(itemName), itemQuantity)
+            } else {
+                // Создает пустой слот
+                inventory.get(cell)
             }
         }
     }

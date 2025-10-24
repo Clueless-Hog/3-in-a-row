@@ -3,19 +3,19 @@ package org.cluelesshog.game.ai
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.Actor
 import engine.AnimationController
 import engine.AnimationPool
-import engine.event.EventBus
-import org.cluelesshog.game.logic.Board
-import org.cluelesshog.game.logic.event.Match
-import org.cluelesshog.game.scene.gamescreen.event.JewelClicked
+import engine.event.listen
+import org.cluelesshog.game.match3.logic.Board
+import org.cluelesshog.game.match3.logic.event.Match
+import org.cluelesshog.game.match3.logic.event.JewelClicked
 
 class SwapBot(
     private val board: Board,
     private val isAllowedToAct: () -> Boolean
-) : Image() {
-    private val delay = 5f
+) : Actor() {
+    private val delay = 3f
     private var elapsed = 0f
 
     private val pool: AnimationPool
@@ -30,8 +30,8 @@ class SwapBot(
 
         controller = pool.getController("idle")
 
-        EventBus.subscribe<Match> {
-            elapsed = 0f
+        listen<Match> {
+            resetIdleTimer()
         }
     }
 
@@ -43,7 +43,7 @@ class SwapBot(
             elapsed += delta
         }
 
-        EventBus.subscribe<JewelClicked> {
+        listen<JewelClicked> {
             controller.switchTo("idle")
             resetIdleTimer()
         }

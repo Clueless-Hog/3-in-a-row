@@ -1,4 +1,4 @@
-package org.cluelesshog.game.scene.gamescreen
+package org.cluelesshog.game.match3.view
 
 import com.badlogic.gdx.Gdx.graphics
 import com.badlogic.gdx.scenes.scene2d.ui.Button
@@ -8,19 +8,19 @@ import ktx.actors.onClick
 import ktx.scene2d.Scene2DSkin
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
-import org.cluelesshog.game.scene.Scene
+import engine.Scene
 import engine.SceneController
 import org.cluelesshog.game.ai.SwapBot
-import engine.event.EventBus
+import engine.event.listen
 import org.cluelesshog.game.asset.SoundManager
 import org.cluelesshog.game.asset.SoundType
-import org.cluelesshog.game.logic.Board
+import org.cluelesshog.game.match3.logic.Board
 import org.cluelesshog.game.craft.view.CraftScene
 import org.cluelesshog.game.inventory.event.StoreMinedOre
-import org.cluelesshog.game.logic.event.Match
-import org.cluelesshog.game.scene.settings.Resolution
-import org.cluelesshog.game.scene.settings.Settings
-import org.cluelesshog.game.scene.settings.SettingsScreen
+import org.cluelesshog.game.match3.logic.event.Match
+import org.cluelesshog.game.settings.Resolution
+import org.cluelesshog.game.settings.Settings
+import org.cluelesshog.game.settings.view.SettingsScreen
 
 class GameScreen : Scene() {
     private var model: Board
@@ -47,7 +47,7 @@ class GameScreen : Scene() {
         swapBot = SwapBot(model) { !view.isLocked() }
 
         // TODO принадлежит другому модулю. Продумать правильную систему инициализации и приостановки
-        EventBus.subscribe<Match> {
+        listen<Match> {
             val handler = StoreMinedOre()
             handler(it)
         }
