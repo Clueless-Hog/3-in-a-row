@@ -16,6 +16,7 @@ class SlotView(val slot: InventorySlot): Group() {
     private val backgroundImage = Image(TextureUtils.loadTexture("empty-slot")).also {
         it.setFillParent(true)
     }
+
     private val itemImage = Image().also {
         it.zIndex = 1
         it.setFillParent(true)
@@ -31,9 +32,10 @@ class SlotView(val slot: InventorySlot): Group() {
 
     companion object {
         private fun loadItemTexture(item: Item?): TextureRegionDrawable? {
+            val atlasName= "Shikashi's Fantasy Icons Pack v2/#2 - Transparent Icons & Drop Shadow"
             return when {
                 item == null -> null
-                else -> TextureUtils.loadTexture(item.name.lowercase())
+                else -> TextureUtils.loadTexture(item.name.lowercase(), atlasName)
             }
         }
     }

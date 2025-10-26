@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.Actor
 import engine.AnimationController
 import engine.AnimationPool
+import engine.asset.AssetLoader
 import engine.event.listen
 import org.cluelesshog.game.match3.logic.Board
 import org.cluelesshog.game.match3.logic.event.Match
@@ -22,7 +23,7 @@ class SwapBot(
     private val controller: AnimationController
 
     init {
-        val atlas = TextureAtlas(Gdx.files.internal("sprites/swap_helper.atlas"))
+        val atlas = AssetLoader.getAtlas("swap_helper")
 
         pool = AnimationPool(atlas)
         pool.createAnimation("idle", "helper_sleep", frameDuration = .6f)

@@ -1,0 +1,22 @@
+#2 - Transparent Icons & Drop Shadow.png
+size: 512, 867
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+pma: false
+flamberge_sword
+  bounds: 192, 160, 32, 32
+helmet
+  bounds: 32, 224, 32, 32
+iron
+  bounds: 288, 640, 32, 32
+copper
+  bounds: 128, 640, 32, 32
+orichalcum
+  bounds: 320, 640, 32, 32
+quartz
+  bounds: 352, 640, 32, 32
+iron_sword
+  bounds: 0, 160, 32, 32
+gold
+  bounds: 320, 384, 32, 32

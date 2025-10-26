@@ -1,6 +1,6 @@
 package org.cluelesshog.game.asset
 
-import asset.AssetLoader
+import engine.asset.AssetLoader
 import com.badlogic.gdx.audio.Sound
 import org.cluelesshog.game.settings.Settings
 

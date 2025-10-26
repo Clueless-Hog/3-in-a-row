@@ -17,7 +17,7 @@ object Inventory: Iterable<InventorySlot> {
     }
 
     fun store(item: Item, quantity: Int = 1): InventorySlot {
-        val existingSlot = slots.firstOrNull { it.item?.name == item.name }
+        val existingSlot = findSlot(item)
         if (existingSlot != null) {
             existingSlot.quantity += quantity
 
@@ -85,6 +85,8 @@ object Inventory: Iterable<InventorySlot> {
         return slots.iterator()
     }
 
+    fun findSlot(withItem: Item) = slots.firstOrNull { it.item?.name == withItem.name }
+
     fun size(): Int {
         return slots.size
     }
@@ -106,7 +108,7 @@ private object PersistentStorage {
             val itemName = storage.getOrNull<String>("$key.name")
             if (itemName !== null) {
                 val itemQuantity = storage.getOrNull<Int>("$key.quantity")!!
-                inventory.store(cell, Item(itemName), itemQuantity)
+                inventory.store(cell, ItemRef.all[itemName]!!, itemQuantity)
             } else {
                 // Создает пустой слот
                 inventory.get(cell)

@@ -1,9 +1,10 @@
-package asset
+package engine.asset
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 
 object AssetLoader {
     private val manager = AssetManager()
@@ -32,5 +33,10 @@ object AssetLoader {
 
     fun getSound(name: String): Sound {
         return manager.get("sounds/$name.wav", Sound::class.java)
+    }
+
+    // @TODO сделать нормальный загрузчик
+    fun getAtlas(name: String): TextureAtlas {
+        return TextureAtlas(Gdx.files.internal("sprites/$name.atlas"))
     }
 }
