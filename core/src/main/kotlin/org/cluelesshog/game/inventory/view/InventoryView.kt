@@ -11,7 +11,7 @@ class InventoryView(private val dimension: Int, private val slotSize: Float, pri
     private val padding = 5
     private var currentlySelectedSlot: SlotView? = null
 
-    private var onSlotSelected: (SlotView) -> Unit = {}
+    private var onSlotClicked: (SlotView) -> Unit = {}
 
     init {
         require(dimension > 0) { "Инвентарь должен иметь хотя бы одну ячейку" }
@@ -40,8 +40,8 @@ class InventoryView(private val dimension: Int, private val slotSize: Float, pri
         }
     }
 
-    fun onSlotSelected(listener: (SlotView) -> Unit) {
-        onSlotSelected = listener
+    fun onSlotClicked(listener: (SlotView) -> Unit) {
+        onSlotClicked = listener
     }
 
     private fun createSlot(row: Int, col: Int): SlotView {
@@ -54,13 +54,12 @@ class InventoryView(private val dimension: Int, private val slotSize: Float, pri
                     if (isHighlighted) {
                         unhighlight()
                         currentlySelectedSlot = null
-                        onSlotSelected(it)
                     } else {
                         highlight()
                         currentlySelectedSlot?.unhighlight()
                         currentlySelectedSlot = it
-                        onSlotSelected(it)
                     }
+                    onSlotClicked(it)
                 }
             }
         }

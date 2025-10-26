@@ -27,10 +27,16 @@ class CraftScene: Scene() {
 
         val sellItemButton = TextButton("", theme).also { it.revert() }
 
-        inventoryView.onSlotSelected { selectedSlot ->
+        inventoryView.onSlotClicked { selectedSlot ->
             val slotInfo = selectedSlot.slot
-            if (slotInfo.item == null || slotInfo.item == ItemRef.GOLD) {
-                return@onSlotSelected
+            if (slotInfo.item == null) {
+                return@onSlotClicked
+            }
+
+            if (slotInfo.item == ItemRef.GOLD) {
+                sellItemButton.revert()
+
+                return@onSlotClicked
             }
 
             if (selectedSlot.isHighlighted) {
