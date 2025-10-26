@@ -1,0 +1,14 @@
+swap_helper.png
+size: 500, 1612
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+pma: false
+helper_active
+  bounds: 0, 0, 408, 612
+helper_sleep
+  bounds: 0, 612, 500, 500
+  index: 1
+helper_sleep
+  bounds: 0, 1112, 500, 500
+  index: 2

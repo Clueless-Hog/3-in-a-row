@@ -1,4 +1,7 @@
-package org.cluelesshog.game.logic
+package org.cluelesshog.game.logic.event
+
+import org.cluelesshog.game.logic.Jewel
+import org.cluelesshog.game.logic.JewelPos
 
 data class Match(
     val matches: List<JewelPos>,
