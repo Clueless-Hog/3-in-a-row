@@ -17,7 +17,11 @@ object GameSave {
 
     // warning: передача псевдотипов таких как UInt приведет к неожиданным результатам
     // TODO сделать контракт более ограниченным и надежным
-    fun save(name: String, value: Any) {
+    fun save(name: String, value: String) {
+        data[name] = value
+    }
+
+    fun save(name: String, value: Int) {
         data[name] = value
     }
 
