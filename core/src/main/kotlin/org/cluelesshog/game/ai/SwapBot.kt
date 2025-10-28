@@ -1,14 +1,13 @@
 package org.cluelesshog.game.ai
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.Actor
 import engine.AnimationController
 import engine.AnimationPool
 import engine.asset.AssetLoader
 import engine.event.listen
 import org.cluelesshog.game.match3.logic.Board
+import org.cluelesshog.game.match3.logic.RNG
 import org.cluelesshog.game.match3.logic.event.Match
 import org.cluelesshog.game.match3.logic.event.JewelClicked
 
@@ -50,7 +49,8 @@ class SwapBot(
         }
 
         if (elapsed > delay) {
-            SwapAI.randomSwap(board)
+            val move = board.getPossibleMoves().random(RNG.seed)
+            board.swap(move.first, move.second)
 
             controller.switchTo("active")
             resetIdleTimer()
