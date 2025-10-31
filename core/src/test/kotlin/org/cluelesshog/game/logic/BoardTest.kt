@@ -46,9 +46,9 @@ class BoardTest {
         val firstSwap = listen<Match> {
             assertMatches(
                 listOf(
-                    JewelPos(0, 0),
-                    JewelPos(1, 0),
-                    JewelPos(2, 0)
+                    Jewel(JewelPos(0, 0), DIAMOND),
+                    Jewel(JewelPos(1, 0), DIAMOND),
+                    Jewel(JewelPos(2, 0), DIAMOND)
                 ), it
             )
             assertJewelsFellDown(it)
@@ -78,9 +78,9 @@ class BoardTest {
         val secondSwap = listen<Match>{
             assertMatches(
                 listOf(
-                    JewelPos(0, 0),
-                    JewelPos(1, 0),
-                    JewelPos(2, 0)
+                    Jewel(JewelPos(0, 0), RUBY),
+                    Jewel(JewelPos(1, 0), RUBY),
+                    Jewel(JewelPos(2, 0), RUBY)
                 ), it
             )
             assertJewelsFellDown(it)
@@ -115,7 +115,7 @@ class BoardTest {
     }
 
     private fun assertMatches(
-        expected: List<JewelPos>,
+        expected: List<Jewel>,
         actual: Match
     ) {
         assertEquals(expected, actual.matches)
