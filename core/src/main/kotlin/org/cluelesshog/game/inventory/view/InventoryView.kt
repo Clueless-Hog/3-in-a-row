@@ -7,7 +7,11 @@ import org.cluelesshog.game.inventory.Inventory
 import org.cluelesshog.game.inventory.event.ItemAdded
 import org.cluelesshog.game.inventory.event.ItemRemoved
 
-class InventoryView(private val dimension: Int, private val slotSize: Float, private val inventory: Inventory) : Table() {
+class InventoryView(
+    private val dimension: Int,
+    private val inventory: Inventory,
+    slotSize: Float
+) : Table() {
     private val padding = 5
     private var currentlySelectedSlot: SlotView? = null
 
@@ -29,13 +33,13 @@ class InventoryView(private val dimension: Int, private val slotSize: Float, pri
             row()
         }
 
-        listen { it: ItemAdded ->
-            val slotView = findActor<SlotView>("slot:${it.slot.cell}")
+        listen { item: ItemAdded ->
+            val slotView = findActor<SlotView>("slot:${item.slot.cell}")
             slotView.update()
         }
 
-        listen { it: ItemRemoved ->
-            val slotView = findActor<SlotView>("slot:${it.slot.cell}")
+        listen { item: ItemRemoved ->
+            val slotView = findActor<SlotView>("slot:${item.slot.cell}")
             slotView.update()
         }
     }

@@ -100,7 +100,9 @@ private object PersistentStorage {
     private val storage = GameSave
 
     fun loadInto(inventory: Inventory) {
-        require(inventory.size() == 0) { "Попытка загрузить состояние в непустой инвентарь приведет к неожиданному результату" }
+        require(inventory.size() == 0) {
+            "Попытка загрузить состояние в непустой инвентарь приведет к неожиданному результату"
+        }
 
         val persistedInventorySize = storage.getOrNull<Int>("inventory.size") ?: 0
         for (cell in 1..persistedInventorySize) {

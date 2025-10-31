@@ -46,7 +46,7 @@ class CraftScene: Scene() {
     override fun load(): Boolean {
         val dimension = 5
         val slotSize = boardSize/dimension
-        val inventoryView = InventoryView(dimension, slotSize, inventory)
+        val inventoryView = InventoryView(dimension, inventory, slotSize)
 
         inventoryView.onSlotClicked { onInventorySlotClicked(it) }
 

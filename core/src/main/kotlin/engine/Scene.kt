@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScalingViewport
 import ktx.app.KtxScreen
-import engine.Config
 import org.cluelesshog.game.asset.Theme
 import org.cluelesshog.game.settings.Settings
 

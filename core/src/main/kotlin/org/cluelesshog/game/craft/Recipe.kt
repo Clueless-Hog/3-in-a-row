@@ -1,6 +1,5 @@
 package org.cluelesshog.game.craft
 
-import org.cluelesshog.game.inventory.Item
 import org.cluelesshog.game.inventory.ItemRef
 
 data class Recipe(val requirements: Set<ItemRequirement>, val result: CraftResult) {
