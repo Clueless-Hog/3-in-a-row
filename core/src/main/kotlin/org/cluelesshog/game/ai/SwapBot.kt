@@ -1,28 +1,28 @@
 package org.cluelesshog.game.ai
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.Actor
 import engine.AnimationController
 import engine.AnimationPool
-import engine.event.EventBus
-import org.cluelesshog.game.logic.Board
-import org.cluelesshog.game.logic.event.Match
-import org.cluelesshog.game.scene.gamescreen.event.JewelClicked
+import engine.asset.AssetLoader
+import engine.event.listen
+import org.cluelesshog.game.match3.logic.Board
+import org.cluelesshog.game.match3.logic.RNG
+import org.cluelesshog.game.match3.logic.event.Match
+import org.cluelesshog.game.match3.logic.event.JewelClicked
 
 class SwapBot(
     private val board: Board,
     private val isAllowedToAct: () -> Boolean
-) : Image() {
-    private val delay = 5f
+) : Actor() {
+    private val delay = 3f
     private var elapsed = 0f
 
     private val pool: AnimationPool
     private val controller: AnimationController
 
     init {
-        val atlas = TextureAtlas(Gdx.files.internal("sprites/swap_helper.atlas"))
+        val atlas = AssetLoader.getAtlas("swap_helper")
 
         pool = AnimationPool(atlas)
         pool.createAnimation("idle", "helper_sleep", frameDuration = .6f)
@@ -30,8 +30,8 @@ class SwapBot(
 
         controller = pool.getController("idle")
 
-        EventBus.subscribe<Match> {
-            elapsed = 0f
+        listen<Match> {
+            resetIdleTimer()
         }
     }
 
@@ -43,13 +43,14 @@ class SwapBot(
             elapsed += delta
         }
 
-        EventBus.subscribe<JewelClicked> {
+        listen<JewelClicked> {
             controller.switchTo("idle")
             resetIdleTimer()
         }
 
         if (elapsed > delay) {
-            SwapAI.randomSwap(board)
+            val move = board.getPossibleMoves().random(RNG.seed)
+            board.swap(move.first, move.second)
 
             controller.switchTo("active")
             resetIdleTimer()

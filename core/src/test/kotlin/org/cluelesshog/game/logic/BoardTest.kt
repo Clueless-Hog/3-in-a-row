@@ -1,12 +1,18 @@
 package org.cluelesshog.game.logic
 
-import engine.event.EventBus
-import org.cluelesshog.game.logic.JewelType.DIAMOND
-import org.cluelesshog.game.logic.JewelType.EMERALD
-import org.cluelesshog.game.logic.JewelType.RUBY
-import org.cluelesshog.game.logic.JewelType.AMETHYST
-import org.cluelesshog.game.logic.event.JewelSwapped
-import org.cluelesshog.game.logic.event.Match
+import engine.event.listen
+import engine.event.stopListening
+import org.cluelesshog.game.match3.logic.Board
+import org.cluelesshog.game.match3.logic.Jewel
+import org.cluelesshog.game.match3.logic.JewelPos
+import org.cluelesshog.game.match3.logic.JewelType
+import org.cluelesshog.game.match3.logic.JewelType.DIAMOND
+import org.cluelesshog.game.match3.logic.JewelType.EMERALD
+import org.cluelesshog.game.match3.logic.JewelType.RUBY
+import org.cluelesshog.game.match3.logic.JewelType.AMETHYST
+import org.cluelesshog.game.match3.logic.event.Match
+import org.cluelesshog.game.match3.logic.RNG
+import org.cluelesshog.game.match3.logic.event.JewelSwapped
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -24,7 +30,7 @@ class BoardTest {
     fun setup() {
         RNG.setSeed(123)
 
-        EventBus.subscribe<JewelSwapped> {
+        listen<JewelSwapped> {
             isSwapped = true
         }
 
@@ -37,12 +43,12 @@ class BoardTest {
 
     @Test
     fun testSwapHappens() {
-        val firstSwap = EventBus.subscribe<Match> {
+        val firstSwap = listen<Match> {
             assertMatches(
                 listOf(
-                    JewelPos(0, 0),
-                    JewelPos(1, 0),
-                    JewelPos(2, 0)
+                    Jewel(JewelPos(0, 0), DIAMOND),
+                    Jewel(JewelPos(1, 0), DIAMOND),
+                    Jewel(JewelPos(2, 0), DIAMOND)
                 ), it
             )
             assertJewelsFellDown(it)
@@ -66,15 +72,15 @@ class BoardTest {
                 "RDR"
             ), board
         )
-        EventBus.unsubscribe(firstSwap)
+        stopListening(firstSwap)
 
         isSwapped = false
-        val secondSwap = EventBus.subscribe<Match>{
+        val secondSwap = listen<Match>{
             assertMatches(
                 listOf(
-                    JewelPos(0, 0),
-                    JewelPos(1, 0),
-                    JewelPos(2, 0)
+                    Jewel(JewelPos(0, 0), RUBY),
+                    Jewel(JewelPos(1, 0), RUBY),
+                    Jewel(JewelPos(2, 0), RUBY)
                 ), it
             )
             assertJewelsFellDown(it)
@@ -98,7 +104,7 @@ class BoardTest {
                 "EDD"
             ), board
         )
-        EventBus.unsubscribe(secondSwap)
+        stopListening(secondSwap)
     }
 
     private fun assertNewJewels(
@@ -109,7 +115,7 @@ class BoardTest {
     }
 
     private fun assertMatches(
-        expected: List<JewelPos>,
+        expected: List<Jewel>,
         actual: Match
     ) {
         assertEquals(expected, actual.matches)
@@ -132,7 +138,7 @@ class BoardTest {
         val matches = result.matches
         val movedJewels = result.movedJewels
 
-        val matchesByCol = matches.groupBy { it.column }.mapValues { entry -> entry.value.map { it.row } }
+        val matchesByCol = matches.groupBy { it.pos.column }.mapValues { entry -> entry.value.map { it.pos.row } }
 
         for ((pos, steps) in movedJewels) {
             val matchRowsInCol = matchesByCol[pos.column] ?: emptyList()

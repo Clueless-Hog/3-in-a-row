@@ -19,3 +19,15 @@ object EventBus {
         listeners[event::class.java]?.forEach { it(event) }
     }
 }
+
+fun signal(event: Any) {
+    EventBus.post(event)
+}
+
+fun stopListening(process: EventBus.Subscription) {
+    EventBus.unsubscribe(process)
+}
+
+inline fun <reified T : Any> listen(noinline listener: (T) -> Unit): EventBus.Subscription {
+    return EventBus.subscribe<T>(listener)
+}
