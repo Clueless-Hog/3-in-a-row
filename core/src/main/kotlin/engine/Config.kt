@@ -8,7 +8,7 @@ object Config {
         ignoreIfMissing = true
     }
 
-    val DEBUG_MODE: Boolean = env.get("DEBUG_MODE")?.toBoolean() ?: false
+    val DEBUG_MODE: Boolean = env.get("DEBUG_MODE")?.toBoolean() ?: true
 
     val GAME_SEED = env.get("GAME_SEED")?.toLong() ?: System.currentTimeMillis()
 }
