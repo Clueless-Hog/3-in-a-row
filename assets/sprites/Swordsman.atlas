@@ -1,0 +1,92 @@
+Swordsman.png
+size: 1792, 128
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+pma: false
+idle_down
+  bounds: 0, 0, 64, 64
+  index: 1
+idle_left
+  bounds: 64, 0, 64, 64
+  index: 1
+idle_right
+  bounds: 128, 0, 64, 64
+  index: 1
+idle_up
+  bounds: 192, 0, 64, 64
+  index: 1
+Swordsman
+  bounds: 0, 64, 1792, 64
+walk_down
+  bounds: 256, 0, 64, 64
+  index: 0
+walk_down
+  bounds: 320, 0, 64, 64
+  index: 1
+walk_down
+  bounds: 384, 0, 64, 64
+  index: 2
+walk_down
+  bounds: 448, 0, 64, 64
+  index: 3
+walk_down
+  bounds: 512, 0, 64, 64
+  index: 4
+walk_down
+  bounds: 576, 0, 64, 64
+  index: 5
+walk_left
+  bounds: 640, 0, 64, 64
+  index: 6
+walk_left
+  bounds: 704, 0, 64, 64
+  index: 7
+walk_left
+  bounds: 768, 0, 64, 64
+  index: 8
+walk_left
+  bounds: 832, 0, 64, 64
+  index: 9
+walk_left
+  bounds: 896, 0, 64, 64
+  index: 10
+walk_left
+  bounds: 960, 0, 64, 64
+  index: 11
+walk_right
+  bounds: 1024, 0, 64, 64
+  index: 12
+walk_right
+  bounds: 1088, 0, 64, 64
+  index: 13
+walk_right
+  bounds: 1152, 0, 64, 64
+  index: 14
+walk_right
+  bounds: 1216, 0, 64, 64
+  index: 15
+walk_right
+  bounds: 1280, 0, 64, 64
+  index: 16
+walk_right
+  bounds: 1344, 0, 64, 64
+  index: 17
+walk_up
+  bounds: 1408, 0, 64, 64
+  index: 18
+walk_up
+  bounds: 1472, 0, 64, 64
+  index: 19
+walk_up
+  bounds: 1536, 0, 64, 64
+  index: 20
+walk_up
+  bounds: 1600, 0, 64, 64
+  index: 21
+walk_up
+  bounds: 1664, 0, 64, 64
+  index: 22
+walk_up
+  bounds: 1728, 0, 64, 64
+  index: 23
