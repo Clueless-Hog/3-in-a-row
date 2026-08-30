@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="12">
+ <tileset firstgid="1" source="tilesets/Tilesheet_No_Shadow.tsx"/>
+ <tileset firstgid="2913" source="tilesets/Decorations_c1.tsx"/>
+ <tileset firstgid="4533" source="objects.tsx"/>
+ <layer id="1" name="ground" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJy9VlsOgzAMq3YuHj0Soz0ScM6BNAvLuC0fbB/+2Zo4sZOWPoTQG4w73gXEQkwNw47tdaKU+0nkg/OPvAdfMvoMP+4zFvyKjVrXb71Pa7AKEv0HP5Yb3LUalQd53QzPOzryosbNNU4FTe/O88E7URy4VRtwdjfqi8Ld4uWaeR4X0mSkvK5nl0e9dbxZzkXiyxQ7F3rO5jd3P2k8e6T1bMaT2hlXg3rBZ1eJR306TyWPoA1ylLg5HvmVw/WnvFo3drN2RvVz+6w8zmOOB3g/Ujh3V/uAXjoLMVxng/OmcNUM4H1AveplbTbVH83p3iPVDn25XUR87X7gfjmn6qzasb/Op9Z3Affr9Of7iu91zt26f1r9uvcA0PtH97j2vdO6C917AHwAQ90IAg==
+  </data>
+ </layer>
+ <objectgroup id="4" name="objects">
+  <object id="11" gid="4535" x="267.706" y="133.345" width="98.5887" height="138.024"/>
+ </objectgroup>
+</map>

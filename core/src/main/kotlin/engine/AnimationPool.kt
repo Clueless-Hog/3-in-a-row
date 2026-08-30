@@ -22,9 +22,8 @@ class AnimationPool(private val atlas: TextureAtlas) {
 
     fun getController(currentAnimation: String) = AnimationController(this, currentAnimation)
 
-    fun getAnimation(name: String): Animation<TextureRegion> {
-        return animations[name] ?: throw IllegalArgumentException("Animation '$name' not found")
-    }
+    fun getAnimation(name: String) =
+        animations[name] ?: throw IllegalArgumentException("Animation '$name' not found")
 }
 
 //fun main() {

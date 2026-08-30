@@ -1,5 +1,7 @@
 package org.cluelesshog.game.asset
 
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import engine.asset.AssetLoader.getTile
 import engine.asset.AssetLoader.getAtlas
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -21,6 +23,18 @@ object TextureUtils {
             val atlas = getAtlas(atlas)
 
             TextureRegionDrawable(atlas.findRegion(texture))
+        }
+    }
+
+    fun loadInvisibleTexture(): TextureRegionDrawable {
+        return cache.getOrPut("invisible") {
+            val pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+            pixmap.setColor(0f, 0f, 0f, 0f)
+            pixmap.fill()
+            val texture = Texture(pixmap)
+            pixmap.dispose()
+
+            TextureRegionDrawable(TextureRegion(texture))
         }
     }
 }

@@ -37,6 +37,24 @@ dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 
+  api "com.badlogicgames.ashley:ashley:$ashleyVersion"
+  api "com.badlogicgames.box2dlights:box2dlights:$box2dlightsVersion"
+  api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+  api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+  api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  // freetype font support for skins
+  api "com.github.raeleus.stripe:freetype:$stripeVersion"
+  // ten patch for better ProgressBar support (scene2d)
+  api "com.github.raeleus.TenPatch:tenpatch:$tenPatchVersion"
+  // typing label support
+  api "com.github.tommyettinger:textratypist:$textraTypistVersion"
+  api "com.github.tommyettinger:freetypist:$freeTypistVersion"
+
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
+
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }

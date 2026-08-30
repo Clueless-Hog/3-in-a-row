@@ -4,7 +4,8 @@ package org.cluelesshog.game.lwjgl3
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
-import org.cluelesshog.game.Launcher
+import org.cluelesshog.game.GdxGame
+import org.cluelesshog.game.rpg.MainScreen
 import org.cluelesshog.game.settings.Settings
 
 /** Launches the desktop (LWJGL3) application. */
@@ -12,7 +13,7 @@ fun main() {
     // This handles macOS support and helps on Windows.
     if (StartupHelper.startNewJvmIfRequired())
       return
-    Lwjgl3Application(Launcher(), Lwjgl3ApplicationConfiguration().apply {
+    Lwjgl3Application(GdxGame, Lwjgl3ApplicationConfiguration().apply {
         setTitle("3 in row")
         //// Vsync limits the frames per second to what your hardware can display, and helps eliminate
         //// screen tearing. This setting doesn't always work on Linux, so the line after is a safeguard.
@@ -26,7 +27,7 @@ fun main() {
 
         setWindowedMode(Settings.resolution.width, Settings.resolution.height)
 
-        setResizable(false)
+        setResizable(true)
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         //// They can also be loaded from the root of assets/ .
         setWindowIcon(*(arrayOf(128, 64, 32, 16).map { "libgdx$it.png" }.toTypedArray()))

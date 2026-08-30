@@ -16,7 +16,7 @@ class PlayerActor(
     private val gameMap: GameMap,
     private val collisionSystem: CollisionSystem = CollisionSystem(gameMap)
 ) : Actor() {
-    var speed = 200f
+    var speed = 5f
     private var direction = DOWN
 
     private var pool: AnimationPool

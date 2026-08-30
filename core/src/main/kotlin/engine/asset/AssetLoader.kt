@@ -17,26 +17,19 @@ object AssetLoader {
     init {
         assetList.forEach {
             val file = Gdx.files.internal(it)
-            if (file.name().endsWith(".png")) {
-                manager.load(file.path(), Texture::class.java)
-            } else if (file.name().endsWith(".wav")) {
-                manager.load(file.path(), Sound::class.java)
+            when (file.extension()) {
+                "png" -> manager.load(file.path(), Texture::class.java)
+                "atlas" -> manager.load(file.path(), TextureAtlas::class.java)
+                "wav" -> manager.load(file.path(), Sound::class.java)
             }
         }
 
         manager.finishLoading()
     }
 
-    fun getTile(name: String): Texture {
-        return manager.get("tiles/$name.png", Texture::class.java)
-    }
+    fun getTile(name: String): Texture = manager.get("tiles/$name.png")
 
-    fun getSound(name: String): Sound {
-        return manager.get("sounds/$name.wav", Sound::class.java)
-    }
+    fun getSound(name: String): Sound = manager.get("sounds/$name.wav")
 
-    // @TODO сделать нормальный загрузчик
-    fun getAtlas(name: String): TextureAtlas {
-        return TextureAtlas(Gdx.files.internal("sprites/$name.atlas"))
-    }
+    fun getAtlas(name: String): TextureAtlas = manager.get("sprites/$name.atlas")
 }
